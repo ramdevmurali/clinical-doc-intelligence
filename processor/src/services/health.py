@@ -1,0 +1,2 @@
+"""Worker health check placeholder."""
+

@@ -1,0 +1,19 @@
+Discharge Summary
+
+Patient: Synthetic Patient 001
+
+Past Medical History:
+Hypertension and type 2 diabetes.
+
+Family History:
+Mother had breast cancer.
+
+Review of Systems:
+Patient denies chest pain.
+
+Procedures:
+Circumcision was not performed.
+
+Medications:
+Metformin 500 mg twice daily. Warfarin discontinued due to bleeding risk.
+

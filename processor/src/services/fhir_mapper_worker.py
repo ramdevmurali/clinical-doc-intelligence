@@ -1,0 +1,2 @@
+"""FHIR mapper worker placeholder."""
+

@@ -1,0 +1,2 @@
+"""Processor application entrypoint placeholder."""
+

@@ -1,0 +1,2 @@
+"""Document sectioning logic placeholder."""
+

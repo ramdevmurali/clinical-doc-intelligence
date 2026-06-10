@@ -1,0 +1,2 @@
+"""Validation worker placeholder."""
+

@@ -1,0 +1,2 @@
+"""Clinical extraction schema placeholder."""
+

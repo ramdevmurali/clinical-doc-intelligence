@@ -1,0 +1,49 @@
+{
+  "document_id": "note_001",
+  "items": [
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "source_quote": "Hypertension and type 2 diabetes."
+    },
+    {
+      "type": "condition",
+      "name": "type 2 diabetes",
+      "status": "active",
+      "source_quote": "Hypertension and type 2 diabetes."
+    },
+    {
+      "type": "family_history",
+      "condition": "breast cancer",
+      "relation": "mother",
+      "source_quote": "Mother had breast cancer."
+    },
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "source_quote": "Patient denies chest pain."
+    },
+    {
+      "type": "procedure",
+      "name": "circumcision",
+      "status": "not_performed",
+      "source_quote": "Circumcision was not performed."
+    },
+    {
+      "type": "medication",
+      "name": "metformin",
+      "dose": "500 mg",
+      "frequency": "twice daily",
+      "status": "active",
+      "source_quote": "Metformin 500 mg twice daily."
+    },
+    {
+      "type": "medication",
+      "name": "warfarin",
+      "status": "discontinued",
+      "source_quote": "Warfarin discontinued due to bleeding risk."
+    }
+  ]
+}
+

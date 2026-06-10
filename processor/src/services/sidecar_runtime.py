@@ -1,0 +1,2 @@
+"""Worker sidecar runtime placeholder."""
+

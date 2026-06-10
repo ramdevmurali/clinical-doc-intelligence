@@ -1,0 +1,2 @@
+// React application entrypoint placeholder.
+

@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: clinical-doc-intelligence-postgres
+    environment:
+      POSTGRES_DB: clinical_doc_intelligence
+      POSTGRES_USER: clinical_doc_intelligence
+      POSTGRES_PASSWORD: clinical_doc_intelligence
+    ports:
+      - "5432:5432"
+    volumes:
+      - clinical_doc_intelligence_postgres:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+
+  redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: clinical-doc-intelligence-redpanda
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://localhost:9092
+    ports:
+      - "9092:9092"
+      - "9644:9644"
+
+volumes:
+  clinical_doc_intelligence_postgres:

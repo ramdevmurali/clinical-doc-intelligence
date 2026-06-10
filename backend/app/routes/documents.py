@@ -1,0 +1,2 @@
+"""Document API routes placeholder."""
+

@@ -1,0 +1,2 @@
+"""Processor metrics placeholder."""
+

@@ -1,0 +1,2 @@
+"""Extraction worker placeholder."""
+

@@ -1,0 +1,2 @@
+"""Processor database adapter placeholder."""
+

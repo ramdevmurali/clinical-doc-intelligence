@@ -1,0 +1,2 @@
+"""Processor Kafka adapter placeholder."""
+

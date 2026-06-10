@@ -1,0 +1,2 @@
+"""FHIR-style mapping placeholder."""
+

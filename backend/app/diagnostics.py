@@ -1,0 +1,2 @@
+"""Pipeline diagnostics placeholder."""
+
