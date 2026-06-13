@@ -1,0 +1,27 @@
+Outpatient Follow-Up Note
+
+Patient: Synthetic Patient 006
+
+Reason for Visit:
+Follow-up for chronic kidney disease and blood pressure.
+
+History of Present Illness:
+Patient feels well. Denies dizziness, syncope, and leg swelling.
+
+Past Medical History:
+Chronic kidney disease stage 3b. Hypertension. Gout.
+
+Medications:
+Losartan 50 mg daily. Allopurinol 100 mg daily.
+
+Vitals:
+Blood pressure 158/94 mmHg. Heart rate 72 bpm. Weight 84 kg.
+
+Labs:
+Creatinine 2.1 mg/dL. Estimated GFR 34 mL/min/1.73m2. Potassium 5.4 mmol/L. Uric acid 6.1 mg/dL. Hemoglobin A1c 5.6 percent.
+
+Imaging:
+Renal ultrasound shows no hydronephrosis.
+
+Assessment and Plan:
+Hypertension uncontrolled. Increase losartan to 100 mg daily. Repeat basic metabolic panel in two weeks.

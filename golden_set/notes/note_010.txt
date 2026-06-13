@@ -1,0 +1,25 @@
+Post-Operative Discharge Instructions
+
+Patient: Synthetic Patient 010
+Procedure Date: 2026-05-18
+
+Procedure:
+Laparoscopic cholecystectomy performed for symptomatic cholelithiasis.
+
+Hospital Course:
+Patient tolerated the procedure well. No bile leak. No wound infection. Mild postoperative nausea resolved before discharge.
+
+Past Medical History:
+Migraine headaches. Anxiety disorder.
+
+Medications:
+Acetaminophen 650 mg every six hours as needed for pain. Oxycodone 5 mg every six hours as needed for severe pain, dispense eight tablets. Sumatriptan 50 mg as needed for migraine.
+
+Allergies:
+Codeine causes itching.
+
+Discharge Instructions:
+Do not lift more than 10 pounds for two weeks. Keep incision clean and dry. Follow up with surgery clinic in 10 days. Return for fever, worsening abdominal pain, jaundice, or drainage from incision.
+
+Pending Orders:
+Pathology report pending.

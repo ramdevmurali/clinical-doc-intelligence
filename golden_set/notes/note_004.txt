@@ -1,0 +1,21 @@
+Medication Reconciliation Note
+
+Patient: Synthetic Patient 004
+
+Reason for Visit:
+Medication review after recent gastrointestinal bleeding.
+
+Medication History:
+Apixaban 5 mg twice daily was stopped last week after melena. Aspirin 81 mg daily is active. Metoprolol succinate 50 mg daily is active. Ibuprofen was discontinued and should be avoided. Insulin glargine 18 units nightly is active. Hydrochlorothiazide held because sodium was low.
+
+Allergies and Adverse Reactions:
+Sulfa antibiotics caused rash. Morphine caused nausea but no anaphylaxis. Patient denies latex allergy.
+
+Past Medical History:
+Atrial fibrillation. Type 2 diabetes mellitus. Hypertension.
+
+Labs:
+Hemoglobin 9.8 g/dL. Sodium 129 mmol/L.
+
+Assessment:
+Medication reconciliation completed. Avoid NSAIDs. Recheck CBC in one week.

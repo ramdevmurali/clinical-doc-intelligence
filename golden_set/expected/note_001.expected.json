@@ -1,17 +1,47 @@
 {
   "document_id": "note_001",
+  "title": "Discharge summary with negation, family history, and medication status",
+  "data_policy": "synthetic_demo_only",
   "items": [
-    {
-      "type": "condition",
-      "name": "hypertension",
-      "status": "active",
-      "source_quote": "Hypertension and type 2 diabetes."
-    },
     {
       "type": "condition",
       "name": "type 2 diabetes",
       "status": "active",
-      "source_quote": "Hypertension and type 2 diabetes."
+      "source_quote": "The patient is a 58-year-old adult with known type 2 diabetes and hypertension who presented with three days of fatigue."
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "source_quote": "Hypertension."
+    },
+    {
+      "type": "condition",
+      "name": "hyperlipidemia",
+      "status": "active",
+      "source_quote": "Hyperlipidemia."
+    },
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "source_quote": "Patient denies chest pain and denies shortness of breath."
+    },
+    {
+      "type": "negative_finding",
+      "name": "shortness of breath",
+      "source_quote": "Patient denies chest pain and denies shortness of breath."
+    },
+    {
+      "type": "negative_finding",
+      "name": "diabetic ketoacidosis",
+      "source_quote": "No evidence of diabetic ketoacidosis was found during admission."
+    },
+    {
+      "type": "procedure",
+      "name": "appendectomy",
+      "status": "performed",
+      "date": "2018",
+      "source_quote": "Appendectomy in 2018."
     },
     {
       "type": "family_history",
@@ -20,15 +50,16 @@
       "source_quote": "Mother had breast cancer."
     },
     {
-      "type": "negative_finding",
-      "name": "chest pain",
-      "source_quote": "Patient denies chest pain."
+      "type": "family_history",
+      "condition": "coronary artery disease",
+      "relation": "father",
+      "source_quote": "Father has coronary artery disease."
     },
     {
-      "type": "procedure",
-      "name": "circumcision",
-      "status": "not_performed",
-      "source_quote": "Circumcision was not performed."
+      "type": "allergy",
+      "name": "no known drug allergies",
+      "status": "none_known",
+      "source_quote": "No known drug allergies."
     },
     {
       "type": "medication",
@@ -40,10 +71,47 @@
     },
     {
       "type": "medication",
+      "name": "lisinopril",
+      "dose": "10 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Lisinopril 10 mg daily."
+    },
+    {
+      "type": "medication",
       "name": "warfarin",
       "status": "discontinued",
       "source_quote": "Warfarin discontinued due to bleeding risk."
+    },
+    {
+      "type": "procedure",
+      "name": "circumcision",
+      "status": "not_performed",
+      "source_quote": "Circumcision was not performed."
+    },
+    {
+      "type": "order",
+      "name": "primary care follow-up",
+      "status": "planned",
+      "source_quote": "Follow up with primary care in one week."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "breast cancer",
+      "reason": "Family history only"
+    },
+    {
+      "type": "condition",
+      "name": "chest pain",
+      "reason": "Negated symptom"
+    },
+    {
+      "type": "procedure",
+      "name": "circumcision",
+      "status": "performed",
+      "reason": "Explicitly not performed"
     }
   ]
 }
-

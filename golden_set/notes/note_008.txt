@@ -1,0 +1,24 @@
+Pulmonary Consultation Note
+
+Patient: Synthetic Patient 008
+
+Reason for Consult:
+Cough and abnormal chest imaging.
+
+History of Present Illness:
+Patient has two weeks of dry cough and fatigue. Denies hemoptysis. Denies night sweats. CT chest suggests possible early pneumonia versus atelectasis. Malignancy is considered unlikely but not fully excluded.
+
+Past Medical History:
+Former tobacco use. Gastroesophageal reflux disease.
+
+Medications:
+Omeprazole 20 mg daily.
+
+Imaging:
+CT chest shows mild right lower lobe opacity. No pulmonary embolism.
+
+Orders:
+Repeat chest x-ray in six weeks. Start azithromycin 500 mg today then 250 mg daily for four days.
+
+Assessment:
+Possible early pneumonia. Atelectasis also possible. Low suspicion for malignancy.

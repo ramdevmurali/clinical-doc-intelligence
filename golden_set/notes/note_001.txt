@@ -1,19 +1,31 @@
 Discharge Summary
 
 Patient: Synthetic Patient 001
+Encounter: Inpatient discharge after observation for hyperglycemia
+
+Chief Complaint:
+Elevated home glucose readings and fatigue.
+
+History of Present Illness:
+The patient is a 58-year-old adult with known type 2 diabetes and hypertension who presented with three days of fatigue. Patient denies chest pain and denies shortness of breath. No evidence of diabetic ketoacidosis was found during admission.
 
 Past Medical History:
-Hypertension and type 2 diabetes.
+Hypertension. Type 2 diabetes mellitus. Hyperlipidemia.
+
+Past Surgical History:
+Appendectomy in 2018.
 
 Family History:
-Mother had breast cancer.
+Mother had breast cancer. Father has coronary artery disease.
 
-Review of Systems:
-Patient denies chest pain.
+Allergies:
+No known drug allergies.
+
+Medications on Discharge:
+Metformin 500 mg twice daily. Lisinopril 10 mg daily. Warfarin discontinued due to bleeding risk.
 
 Procedures:
-Circumcision was not performed.
+Circumcision was not performed. No inpatient procedures were completed.
 
-Medications:
-Metformin 500 mg twice daily. Warfarin discontinued due to bleeding risk.
-
+Assessment and Plan:
+Continue metformin and lisinopril. Follow up with primary care in one week.

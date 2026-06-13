@@ -1,0 +1,18 @@
+Allergy Clinic Note
+
+Patient: Synthetic Patient 007
+
+Reason for Visit:
+Evaluation of reported medication and environmental allergies.
+
+History:
+Patient reports hives after amoxicillin as a child. Patient denies anaphylaxis. Shellfish causes throat itching. The chart listed iodine allergy, but patient states iodine allergy is incorrect. Patient denies latex allergy.
+
+Past Medical History:
+Seasonal allergic rhinitis. Eczema.
+
+Medications:
+Cetirizine 10 mg daily. Epinephrine autoinjector prescribed today for shellfish reaction risk.
+
+Assessment and Plan:
+Amoxicillin allergy with hives. Shellfish allergy with throat itching. Remove iodine allergy from chart. Continue cetirizine.

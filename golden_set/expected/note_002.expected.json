@@ -1,0 +1,114 @@
+{
+  "document_id": "note_002",
+  "title": "Emergency note with orders, rule-out diagnosis, vitals, and labs",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "right lower quadrant abdominal pain",
+      "status": "active",
+      "source_quote": "A 34-year-old adult presents with twelve hours of right lower quadrant pain and nausea."
+    },
+    {
+      "type": "condition",
+      "name": "nausea",
+      "status": "active",
+      "source_quote": "A 34-year-old adult presents with twelve hours of right lower quadrant pain and nausea."
+    },
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria."
+    },
+    {
+      "type": "negative_finding",
+      "name": "vomiting",
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria."
+    },
+    {
+      "type": "negative_finding",
+      "name": "dysuria",
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria."
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "appendicitis",
+      "status": "rule_out",
+      "source_quote": "Appendicitis is being ruled out."
+    },
+    {
+      "type": "condition",
+      "name": "asthma",
+      "status": "active",
+      "source_quote": "Asthma, mild intermittent."
+    },
+    {
+      "type": "allergy",
+      "name": "penicillin",
+      "reaction": "hives",
+      "source_quote": "Penicillin causes hives."
+    },
+    {
+      "type": "medication",
+      "name": "albuterol inhaler",
+      "frequency": "as needed",
+      "status": "active",
+      "source_quote": "Albuterol inhaler as needed."
+    },
+    {
+      "type": "observation",
+      "name": "heart rate",
+      "value": "104",
+      "unit": "bpm",
+      "source_quote": "Heart rate 104 bpm."
+    },
+    {
+      "type": "lab_result",
+      "name": "white blood cell count",
+      "value": "13.2",
+      "unit": "K/uL",
+      "source_quote": "White blood cell count 13.2 K/uL."
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "value": "0.8",
+      "unit": "mg/dL",
+      "source_quote": "Creatinine 0.8 mg/dL."
+    },
+    {
+      "type": "order",
+      "name": "CT abdomen and pelvis",
+      "status": "ordered",
+      "source_quote": "CT abdomen and pelvis ordered."
+    },
+    {
+      "type": "order",
+      "name": "IV fluids",
+      "status": "ordered",
+      "source_quote": "IV fluids ordered."
+    },
+    {
+      "type": "medication",
+      "name": "ondansetron",
+      "dose": "4 mg",
+      "route": "IV",
+      "status": "administered",
+      "source_quote": "Ondansetron 4 mg IV given."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "appendicitis",
+      "status": "active",
+      "reason": "Rule-out diagnosis only"
+    },
+    {
+      "type": "procedure",
+      "name": "CT abdomen and pelvis",
+      "status": "performed",
+      "reason": "Ordered, not resulted or performed in note"
+    }
+  ]
+}

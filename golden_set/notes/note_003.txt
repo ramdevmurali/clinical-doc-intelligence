@@ -1,0 +1,31 @@
+Inpatient Progress Note
+
+Patient: Synthetic Patient 003
+Hospital Day: 2
+
+Subjective:
+Patient reports improved breathing overnight. No chest pain. No fever or chills.
+
+Past Medical History:
+Congestive heart failure with reduced ejection fraction. Chronic obstructive pulmonary disease. Chronic kidney disease stage 3.
+
+Family History:
+Brother died of myocardial infarction at age 52.
+
+Vitals:
+Blood pressure 146/88 mmHg. Respiratory rate 22/min. Oxygen saturation 92% on 2 L nasal cannula.
+
+Physical Exam:
+Bibasilar crackles present. Mild bilateral lower extremity edema.
+
+Labs:
+Potassium 3.2 mmol/L. Creatinine 1.9 mg/dL. BNP 820 pg/mL.
+
+Imaging:
+Chest x-ray shows pulmonary vascular congestion. No focal pneumonia.
+
+Medications:
+Furosemide 40 mg IV twice daily. Lisinopril held due to acute kidney injury. Prednisone stopped yesterday.
+
+Assessment and Plan:
+Acute on chronic heart failure exacerbation. Continue IV diuresis. Replete potassium. Monitor renal function.

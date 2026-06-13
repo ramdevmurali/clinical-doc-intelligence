@@ -1,0 +1,30 @@
+Primary Care Annual Visit
+
+Patient: Synthetic Patient 009
+
+Chief Concern:
+Annual physical and diabetes follow-up.
+
+History of Present Illness:
+Patient reports home glucose values mostly 120 to 150 mg/dL. No polyuria. No foot ulcers. Mood is stable.
+
+Past Medical History:
+Type 2 diabetes mellitus. Major depressive disorder in remission. Obesity.
+
+Family History:
+Sister has thyroid cancer. Mother has osteoporosis.
+
+Social History:
+Former smoker, quit in 2020. Drinks two beers per week. Works as a school bus driver.
+
+Medications:
+Semaglutide 1 mg weekly. Sertraline 50 mg daily.
+
+Vitals:
+BMI 33 kg/m2. Blood pressure 132/84 mmHg.
+
+Labs:
+Hemoglobin A1c 7.4 percent. LDL cholesterol 118 mg/dL.
+
+Assessment and Plan:
+Diabetes above goal. Increase semaglutide to 2 mg weekly. Depression remains in remission. Order urine albumin and lipid panel. Refer for diabetic eye exam.

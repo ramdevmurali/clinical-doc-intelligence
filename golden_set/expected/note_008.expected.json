@@ -1,0 +1,105 @@
+{
+  "document_id": "note_008",
+  "title": "Uncertainty-heavy pulmonary note with differential diagnosis",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "dry cough",
+      "status": "active",
+      "source_quote": "Patient has two weeks of dry cough and fatigue."
+    },
+    {
+      "type": "condition",
+      "name": "fatigue",
+      "status": "active",
+      "source_quote": "Patient has two weeks of dry cough and fatigue."
+    },
+    {
+      "type": "negative_finding",
+      "name": "hemoptysis",
+      "source_quote": "Denies hemoptysis."
+    },
+    {
+      "type": "negative_finding",
+      "name": "night sweats",
+      "source_quote": "Denies night sweats."
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "early pneumonia",
+      "status": "possible",
+      "source_quote": "CT chest suggests possible early pneumonia versus atelectasis."
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "atelectasis",
+      "status": "possible",
+      "source_quote": "CT chest suggests possible early pneumonia versus atelectasis."
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "malignancy",
+      "status": "unlikely_not_excluded",
+      "source_quote": "Malignancy is considered unlikely but not fully excluded."
+    },
+    {
+      "type": "condition",
+      "name": "former tobacco use",
+      "status": "historical",
+      "source_quote": "Former tobacco use."
+    },
+    {
+      "type": "condition",
+      "name": "gastroesophageal reflux disease",
+      "status": "active",
+      "source_quote": "Gastroesophageal reflux disease."
+    },
+    {
+      "type": "medication",
+      "name": "omeprazole",
+      "dose": "20 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Omeprazole 20 mg daily."
+    },
+    {
+      "type": "observation",
+      "name": "right lower lobe opacity",
+      "status": "present",
+      "source_quote": "CT chest shows mild right lower lobe opacity."
+    },
+    {
+      "type": "negative_finding",
+      "name": "pulmonary embolism",
+      "source_quote": "No pulmonary embolism."
+    },
+    {
+      "type": "order",
+      "name": "repeat chest x-ray",
+      "status": "planned",
+      "source_quote": "Repeat chest x-ray in six weeks."
+    },
+    {
+      "type": "medication",
+      "name": "azithromycin",
+      "dose": "500 mg today then 250 mg daily for four days",
+      "status": "started",
+      "source_quote": "Start azithromycin 500 mg today then 250 mg daily for four days."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "malignancy",
+      "status": "active",
+      "reason": "Explicitly low suspicion and not confirmed"
+    },
+    {
+      "type": "condition",
+      "name": "pulmonary embolism",
+      "status": "active",
+      "reason": "Negated imaging finding"
+    }
+  ]
+}

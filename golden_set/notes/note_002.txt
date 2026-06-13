@@ -1,0 +1,30 @@
+Emergency Department Note
+
+Patient: Synthetic Patient 002
+
+Chief Complaint:
+Right lower quadrant abdominal pain.
+
+History of Present Illness:
+A 34-year-old adult presents with twelve hours of right lower quadrant pain and nausea. The patient denies fever, denies vomiting, and denies dysuria. Appendicitis is being ruled out.
+
+Past Medical History:
+Asthma, mild intermittent.
+
+Allergies:
+Penicillin causes hives.
+
+Medications:
+Albuterol inhaler as needed.
+
+Vitals:
+Temperature 37.1 C. Heart rate 104 bpm. Blood pressure 128/76 mmHg. Oxygen saturation 99% on room air.
+
+Labs:
+White blood cell count 13.2 K/uL. Creatinine 0.8 mg/dL.
+
+Orders:
+CT abdomen and pelvis ordered. IV fluids ordered. Ondansetron 4 mg IV given.
+
+Assessment and Plan:
+Abdominal pain with leukocytosis. Await CT results before surgical consultation.

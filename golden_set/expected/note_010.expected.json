@@ -1,0 +1,119 @@
+{
+  "document_id": "note_010",
+  "title": "Post-operative discharge note with care needs and complications denied",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "procedure",
+      "name": "laparoscopic cholecystectomy",
+      "status": "performed",
+      "date": "2026-05-18",
+      "source_quote": "Laparoscopic cholecystectomy performed for symptomatic cholelithiasis."
+    },
+    {
+      "type": "condition",
+      "name": "symptomatic cholelithiasis",
+      "status": "active",
+      "source_quote": "Laparoscopic cholecystectomy performed for symptomatic cholelithiasis."
+    },
+    {
+      "type": "negative_finding",
+      "name": "bile leak",
+      "source_quote": "No bile leak."
+    },
+    {
+      "type": "negative_finding",
+      "name": "wound infection",
+      "source_quote": "No wound infection."
+    },
+    {
+      "type": "condition",
+      "name": "postoperative nausea",
+      "status": "resolved",
+      "source_quote": "Mild postoperative nausea resolved before discharge."
+    },
+    {
+      "type": "condition",
+      "name": "migraine headaches",
+      "status": "active",
+      "source_quote": "Migraine headaches."
+    },
+    {
+      "type": "condition",
+      "name": "anxiety disorder",
+      "status": "active",
+      "source_quote": "Anxiety disorder."
+    },
+    {
+      "type": "medication",
+      "name": "acetaminophen",
+      "dose": "650 mg",
+      "frequency": "every six hours as needed",
+      "status": "active",
+      "source_quote": "Acetaminophen 650 mg every six hours as needed for pain."
+    },
+    {
+      "type": "medication",
+      "name": "oxycodone",
+      "dose": "5 mg",
+      "frequency": "every six hours as needed",
+      "status": "active",
+      "source_quote": "Oxycodone 5 mg every six hours as needed for severe pain, dispense eight tablets."
+    },
+    {
+      "type": "medication",
+      "name": "sumatriptan",
+      "dose": "50 mg",
+      "frequency": "as needed",
+      "status": "active",
+      "source_quote": "Sumatriptan 50 mg as needed for migraine."
+    },
+    {
+      "type": "allergy",
+      "name": "codeine",
+      "reaction": "itching",
+      "source_quote": "Codeine causes itching."
+    },
+    {
+      "type": "care_need",
+      "name": "lifting restriction",
+      "source_quote": "Do not lift more than 10 pounds for two weeks."
+    },
+    {
+      "type": "care_need",
+      "name": "incision care",
+      "source_quote": "Keep incision clean and dry."
+    },
+    {
+      "type": "order",
+      "name": "surgery clinic follow-up",
+      "status": "planned",
+      "source_quote": "Follow up with surgery clinic in 10 days."
+    },
+    {
+      "type": "care_need",
+      "name": "return precautions",
+      "source_quote": "Return for fever, worsening abdominal pain, jaundice, or drainage from incision."
+    },
+    {
+      "type": "order",
+      "name": "pathology report",
+      "status": "pending",
+      "source_quote": "Pathology report pending."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "bile leak",
+      "status": "active",
+      "reason": "Negated complication"
+    },
+    {
+      "type": "condition",
+      "name": "wound infection",
+      "status": "active",
+      "reason": "Negated complication"
+    }
+  ]
+}

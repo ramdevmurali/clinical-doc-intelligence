@@ -1,0 +1,123 @@
+{
+  "document_id": "note_006",
+  "title": "Lab-heavy outpatient note with abnormal and normal findings",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "chronic kidney disease stage 3b",
+      "status": "active",
+      "source_quote": "Chronic kidney disease stage 3b."
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "source_quote": "Hypertension."
+    },
+    {
+      "type": "condition",
+      "name": "gout",
+      "status": "active",
+      "source_quote": "Gout."
+    },
+    {
+      "type": "negative_finding",
+      "name": "dizziness",
+      "source_quote": "Denies dizziness, syncope, and leg swelling."
+    },
+    {
+      "type": "negative_finding",
+      "name": "syncope",
+      "source_quote": "Denies dizziness, syncope, and leg swelling."
+    },
+    {
+      "type": "negative_finding",
+      "name": "leg swelling",
+      "source_quote": "Denies dizziness, syncope, and leg swelling."
+    },
+    {
+      "type": "medication",
+      "name": "losartan",
+      "dose": "50 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Losartan 50 mg daily."
+    },
+    {
+      "type": "medication",
+      "name": "allopurinol",
+      "dose": "100 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Allopurinol 100 mg daily."
+    },
+    {
+      "type": "observation",
+      "name": "blood pressure",
+      "value": "158/94",
+      "unit": "mmHg",
+      "source_quote": "Blood pressure 158/94 mmHg."
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "value": "2.1",
+      "unit": "mg/dL",
+      "source_quote": "Creatinine 2.1 mg/dL."
+    },
+    {
+      "type": "lab_result",
+      "name": "estimated GFR",
+      "value": "34",
+      "unit": "mL/min/1.73m2",
+      "source_quote": "Estimated GFR 34 mL/min/1.73m2."
+    },
+    {
+      "type": "lab_result",
+      "name": "potassium",
+      "value": "5.4",
+      "unit": "mmol/L",
+      "source_quote": "Potassium 5.4 mmol/L."
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin A1c",
+      "value": "5.6",
+      "unit": "percent",
+      "source_quote": "Hemoglobin A1c 5.6 percent."
+    },
+    {
+      "type": "negative_finding",
+      "name": "hydronephrosis",
+      "source_quote": "Renal ultrasound shows no hydronephrosis."
+    },
+    {
+      "type": "condition",
+      "name": "uncontrolled hypertension",
+      "status": "active",
+      "source_quote": "Hypertension uncontrolled."
+    },
+    {
+      "type": "medication",
+      "name": "losartan",
+      "dose": "100 mg",
+      "frequency": "daily",
+      "status": "planned_change",
+      "source_quote": "Increase losartan to 100 mg daily."
+    },
+    {
+      "type": "order",
+      "name": "basic metabolic panel",
+      "status": "planned",
+      "source_quote": "Repeat basic metabolic panel in two weeks."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "hydronephrosis",
+      "reason": "Negative imaging finding"
+    }
+  ]
+}

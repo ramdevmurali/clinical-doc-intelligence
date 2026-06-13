@@ -1,0 +1,18 @@
+Referral and Procedure Note
+
+Patient: Synthetic Patient 005
+
+Reason for Referral:
+Positive fecal immunochemical test and intermittent rectal bleeding.
+
+History:
+The patient has iron deficiency anemia. No weight loss. No abdominal pain. Father had colon cancer at age 70.
+
+Procedures:
+Flexible sigmoidoscopy was performed today and showed internal hemorrhoids. Colonoscopy was not performed because bowel preparation was incomplete.
+
+Orders and Referrals:
+Patient referred for outpatient colonoscopy. Iron studies ordered. Start ferrous sulfate 325 mg every other day.
+
+Assessment:
+Rectal bleeding likely from hemorrhoids, but colonoscopy is needed to evaluate positive FIT.

@@ -1,0 +1,120 @@
+{
+  "document_id": "note_004",
+  "title": "Medication reconciliation with active, discontinued, held, and adverse reaction items",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "medication",
+      "name": "apixaban",
+      "dose": "5 mg",
+      "frequency": "twice daily",
+      "status": "stopped",
+      "source_quote": "Apixaban 5 mg twice daily was stopped last week after melena."
+    },
+    {
+      "type": "medication",
+      "name": "aspirin",
+      "dose": "81 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Aspirin 81 mg daily is active."
+    },
+    {
+      "type": "medication",
+      "name": "metoprolol succinate",
+      "dose": "50 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Metoprolol succinate 50 mg daily is active."
+    },
+    {
+      "type": "medication",
+      "name": "ibuprofen",
+      "status": "discontinued",
+      "source_quote": "Ibuprofen was discontinued and should be avoided."
+    },
+    {
+      "type": "medication",
+      "name": "insulin glargine",
+      "dose": "18 units",
+      "frequency": "nightly",
+      "status": "active",
+      "source_quote": "Insulin glargine 18 units nightly is active."
+    },
+    {
+      "type": "medication",
+      "name": "hydrochlorothiazide",
+      "status": "held",
+      "source_quote": "Hydrochlorothiazide held because sodium was low."
+    },
+    {
+      "type": "allergy",
+      "name": "sulfa antibiotics",
+      "reaction": "rash",
+      "source_quote": "Sulfa antibiotics caused rash."
+    },
+    {
+      "type": "allergy",
+      "name": "morphine",
+      "reaction": "nausea",
+      "severity": "non_anaphylaxis",
+      "source_quote": "Morphine caused nausea but no anaphylaxis."
+    },
+    {
+      "type": "negative_finding",
+      "name": "latex allergy",
+      "source_quote": "Patient denies latex allergy."
+    },
+    {
+      "type": "condition",
+      "name": "atrial fibrillation",
+      "status": "active",
+      "source_quote": "Atrial fibrillation."
+    },
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "source_quote": "Type 2 diabetes mellitus."
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "source_quote": "Hypertension."
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin",
+      "value": "9.8",
+      "unit": "g/dL",
+      "source_quote": "Hemoglobin 9.8 g/dL."
+    },
+    {
+      "type": "lab_result",
+      "name": "sodium",
+      "value": "129",
+      "unit": "mmol/L",
+      "source_quote": "Sodium 129 mmol/L."
+    },
+    {
+      "type": "order",
+      "name": "CBC",
+      "status": "planned",
+      "source_quote": "Recheck CBC in one week."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "allergy",
+      "name": "latex",
+      "reason": "Denied allergy"
+    },
+    {
+      "type": "medication",
+      "name": "apixaban",
+      "status": "active",
+      "reason": "Stopped medication"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "document_id": "note_003",
+  "title": "Inpatient progress note with discontinued/held medication and negative imaging",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "congestive heart failure with reduced ejection fraction",
+      "status": "active",
+      "source_quote": "Congestive heart failure with reduced ejection fraction."
+    },
+    {
+      "type": "condition",
+      "name": "chronic obstructive pulmonary disease",
+      "status": "active",
+      "source_quote": "Chronic obstructive pulmonary disease."
+    },
+    {
+      "type": "condition",
+      "name": "chronic kidney disease stage 3",
+      "status": "active",
+      "source_quote": "Chronic kidney disease stage 3."
+    },
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "source_quote": "No chest pain."
+    },
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "source_quote": "No fever or chills."
+    },
+    {
+      "type": "family_history",
+      "condition": "myocardial infarction",
+      "relation": "brother",
+      "source_quote": "Brother died of myocardial infarction at age 52."
+    },
+    {
+      "type": "observation",
+      "name": "oxygen saturation",
+      "value": "92",
+      "unit": "%",
+      "source_quote": "Oxygen saturation 92% on 2 L nasal cannula."
+    },
+    {
+      "type": "observation",
+      "name": "bibasilar crackles",
+      "status": "present",
+      "source_quote": "Bibasilar crackles present."
+    },
+    {
+      "type": "lab_result",
+      "name": "potassium",
+      "value": "3.2",
+      "unit": "mmol/L",
+      "source_quote": "Potassium 3.2 mmol/L."
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "value": "1.9",
+      "unit": "mg/dL",
+      "source_quote": "Creatinine 1.9 mg/dL."
+    },
+    {
+      "type": "lab_result",
+      "name": "BNP",
+      "value": "820",
+      "unit": "pg/mL",
+      "source_quote": "BNP 820 pg/mL."
+    },
+    {
+      "type": "observation",
+      "name": "pulmonary vascular congestion",
+      "status": "present",
+      "source_quote": "Chest x-ray shows pulmonary vascular congestion."
+    },
+    {
+      "type": "negative_finding",
+      "name": "focal pneumonia",
+      "source_quote": "No focal pneumonia."
+    },
+    {
+      "type": "medication",
+      "name": "furosemide",
+      "dose": "40 mg",
+      "route": "IV",
+      "frequency": "twice daily",
+      "status": "active",
+      "source_quote": "Furosemide 40 mg IV twice daily."
+    },
+    {
+      "type": "medication",
+      "name": "lisinopril",
+      "status": "held",
+      "source_quote": "Lisinopril held due to acute kidney injury."
+    },
+    {
+      "type": "medication",
+      "name": "prednisone",
+      "status": "stopped",
+      "source_quote": "Prednisone stopped yesterday."
+    },
+    {
+      "type": "condition",
+      "name": "acute on chronic heart failure exacerbation",
+      "status": "active",
+      "source_quote": "Acute on chronic heart failure exacerbation."
+    },
+    {
+      "type": "care_need",
+      "name": "monitor renal function",
+      "source_quote": "Monitor renal function."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "myocardial infarction",
+      "reason": "Family history only"
+    },
+    {
+      "type": "condition",
+      "name": "focal pneumonia",
+      "status": "active",
+      "reason": "Negative imaging finding"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "document_id": "note_007",
+  "title": "Allergy-focused note with corrections and denied allergies",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "allergy",
+      "name": "amoxicillin",
+      "reaction": "hives",
+      "source_quote": "Patient reports hives after amoxicillin as a child."
+    },
+    {
+      "type": "negative_finding",
+      "name": "anaphylaxis",
+      "source_quote": "Patient denies anaphylaxis."
+    },
+    {
+      "type": "allergy",
+      "name": "shellfish",
+      "reaction": "throat itching",
+      "source_quote": "Shellfish causes throat itching."
+    },
+    {
+      "type": "allergy",
+      "name": "iodine",
+      "status": "removed_incorrect",
+      "source_quote": "The chart listed iodine allergy, but patient states iodine allergy is incorrect."
+    },
+    {
+      "type": "negative_finding",
+      "name": "latex allergy",
+      "source_quote": "Patient denies latex allergy."
+    },
+    {
+      "type": "condition",
+      "name": "seasonal allergic rhinitis",
+      "status": "active",
+      "source_quote": "Seasonal allergic rhinitis."
+    },
+    {
+      "type": "condition",
+      "name": "eczema",
+      "status": "active",
+      "source_quote": "Eczema."
+    },
+    {
+      "type": "medication",
+      "name": "cetirizine",
+      "dose": "10 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Cetirizine 10 mg daily."
+    },
+    {
+      "type": "medication",
+      "name": "epinephrine autoinjector",
+      "status": "prescribed",
+      "source_quote": "Epinephrine autoinjector prescribed today for shellfish reaction risk."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "allergy",
+      "name": "latex",
+      "reason": "Denied allergy"
+    },
+    {
+      "type": "allergy",
+      "name": "iodine",
+      "status": "active",
+      "reason": "Incorrect chart allergy removed"
+    }
+  ]
+}

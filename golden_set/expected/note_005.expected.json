@@ -1,0 +1,92 @@
+{
+  "document_id": "note_005",
+  "title": "Referral and procedure distinction note",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "positive fecal immunochemical test",
+      "status": "active",
+      "source_quote": "Positive fecal immunochemical test and intermittent rectal bleeding."
+    },
+    {
+      "type": "condition",
+      "name": "rectal bleeding",
+      "status": "active",
+      "source_quote": "Positive fecal immunochemical test and intermittent rectal bleeding."
+    },
+    {
+      "type": "condition",
+      "name": "iron deficiency anemia",
+      "status": "active",
+      "source_quote": "The patient has iron deficiency anemia."
+    },
+    {
+      "type": "negative_finding",
+      "name": "weight loss",
+      "source_quote": "No weight loss."
+    },
+    {
+      "type": "negative_finding",
+      "name": "abdominal pain",
+      "source_quote": "No abdominal pain."
+    },
+    {
+      "type": "family_history",
+      "condition": "colon cancer",
+      "relation": "father",
+      "source_quote": "Father had colon cancer at age 70."
+    },
+    {
+      "type": "procedure",
+      "name": "flexible sigmoidoscopy",
+      "status": "performed",
+      "source_quote": "Flexible sigmoidoscopy was performed today and showed internal hemorrhoids."
+    },
+    {
+      "type": "condition",
+      "name": "internal hemorrhoids",
+      "status": "active",
+      "source_quote": "Flexible sigmoidoscopy was performed today and showed internal hemorrhoids."
+    },
+    {
+      "type": "procedure",
+      "name": "colonoscopy",
+      "status": "not_performed",
+      "source_quote": "Colonoscopy was not performed because bowel preparation was incomplete."
+    },
+    {
+      "type": "order",
+      "name": "outpatient colonoscopy",
+      "status": "referred",
+      "source_quote": "Patient referred for outpatient colonoscopy."
+    },
+    {
+      "type": "order",
+      "name": "iron studies",
+      "status": "ordered",
+      "source_quote": "Iron studies ordered."
+    },
+    {
+      "type": "medication",
+      "name": "ferrous sulfate",
+      "dose": "325 mg",
+      "frequency": "every other day",
+      "status": "active",
+      "source_quote": "Start ferrous sulfate 325 mg every other day."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "procedure",
+      "name": "colonoscopy",
+      "status": "performed",
+      "reason": "Not performed; outpatient referral only"
+    },
+    {
+      "type": "condition",
+      "name": "colon cancer",
+      "reason": "Family history and evaluation target, not patient diagnosis"
+    }
+  ]
+}

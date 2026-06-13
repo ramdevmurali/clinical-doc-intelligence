@@ -1,0 +1,134 @@
+{
+  "document_id": "note_009",
+  "title": "Primary care note with social history, screening, and chronic disease management",
+  "data_policy": "synthetic_demo_only",
+  "items": [
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "source_quote": "Type 2 diabetes mellitus."
+    },
+    {
+      "type": "condition",
+      "name": "major depressive disorder",
+      "status": "in_remission",
+      "source_quote": "Major depressive disorder in remission."
+    },
+    {
+      "type": "condition",
+      "name": "obesity",
+      "status": "active",
+      "source_quote": "Obesity."
+    },
+    {
+      "type": "negative_finding",
+      "name": "polyuria",
+      "source_quote": "No polyuria."
+    },
+    {
+      "type": "negative_finding",
+      "name": "foot ulcers",
+      "source_quote": "No foot ulcers."
+    },
+    {
+      "type": "family_history",
+      "condition": "thyroid cancer",
+      "relation": "sister",
+      "source_quote": "Sister has thyroid cancer."
+    },
+    {
+      "type": "family_history",
+      "condition": "osteoporosis",
+      "relation": "mother",
+      "source_quote": "Mother has osteoporosis."
+    },
+    {
+      "type": "condition",
+      "name": "former smoker",
+      "status": "historical",
+      "source_quote": "Former smoker, quit in 2020."
+    },
+    {
+      "type": "medication",
+      "name": "semaglutide",
+      "dose": "1 mg",
+      "frequency": "weekly",
+      "status": "active",
+      "source_quote": "Semaglutide 1 mg weekly."
+    },
+    {
+      "type": "medication",
+      "name": "sertraline",
+      "dose": "50 mg",
+      "frequency": "daily",
+      "status": "active",
+      "source_quote": "Sertraline 50 mg daily."
+    },
+    {
+      "type": "observation",
+      "name": "BMI",
+      "value": "33",
+      "unit": "kg/m2",
+      "source_quote": "BMI 33 kg/m2."
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin A1c",
+      "value": "7.4",
+      "unit": "percent",
+      "source_quote": "Hemoglobin A1c 7.4 percent."
+    },
+    {
+      "type": "lab_result",
+      "name": "LDL cholesterol",
+      "value": "118",
+      "unit": "mg/dL",
+      "source_quote": "LDL cholesterol 118 mg/dL."
+    },
+    {
+      "type": "condition",
+      "name": "diabetes above goal",
+      "status": "active",
+      "source_quote": "Diabetes above goal."
+    },
+    {
+      "type": "medication",
+      "name": "semaglutide",
+      "dose": "2 mg",
+      "frequency": "weekly",
+      "status": "planned_change",
+      "source_quote": "Increase semaglutide to 2 mg weekly."
+    },
+    {
+      "type": "order",
+      "name": "urine albumin",
+      "status": "ordered",
+      "source_quote": "Order urine albumin and lipid panel."
+    },
+    {
+      "type": "order",
+      "name": "lipid panel",
+      "status": "ordered",
+      "source_quote": "Order urine albumin and lipid panel."
+    },
+    {
+      "type": "order",
+      "name": "diabetic eye exam",
+      "status": "referred",
+      "source_quote": "Refer for diabetic eye exam."
+    }
+  ],
+  "should_not_extract": [
+    {
+      "type": "condition",
+      "name": "thyroid cancer",
+      "reason": "Family history only"
+    },
+    {
+      "type": "condition",
+      "name": "osteoporosis",
+      "reason": "Family history only"
+    }
+  ]
+}
