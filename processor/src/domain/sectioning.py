@@ -28,38 +28,37 @@ class DocumentSection:
     ordinal: int
 
 
-KNOWN_HEADINGS: frozenset[str] = frozenset(
-    {
-        "assessment",
-        "assessment and plan",
-        "allergies",
-        "allergies and adverse reactions",
-        "chief complaint",
-        "discharge instructions",
-        "family history",
-        "history",
-        "history of present illness",
-        "hospital course",
-        "imaging",
-        "labs",
-        "medication history",
-        "medications",
-        "medications on discharge",
-        "orders",
-        "orders and referrals",
-        "past medical history",
-        "past surgical history",
-        "pending orders",
-        "physical exam",
-        "procedures",
-        "reason for consult",
-        "reason for referral",
-        "reason for visit",
-        "social history",
-        "subjective",
-        "vitals",
-    }
-)
+CANONICAL_HEADINGS: dict[str, str] = {
+    "allergies": "Allergies",
+    "allergies and adverse reactions": "Allergies and Adverse Reactions",
+    "assessment": "Assessment",
+    "assessment and plan": "Assessment and Plan",
+    "chief complaint": "Chief Complaint",
+    "discharge instructions": "Discharge Instructions",
+    "family history": "Family History",
+    "history": "History",
+    "history of present illness": "History of Present Illness",
+    "hospital course": "Hospital Course",
+    "imaging": "Imaging",
+    "labs": "Labs",
+    "medication history": "Medication History",
+    "medications": "Medications",
+    "medications on discharge": "Medications on Discharge",
+    "orders": "Orders",
+    "orders and referrals": "Orders and Referrals",
+    "past medical history": "Past Medical History",
+    "past surgical history": "Past Surgical History",
+    "pending orders": "Pending Orders",
+    "physical exam": "Physical Exam",
+    "procedures": "Procedures",
+    "reason for consult": "Reason for Consult",
+    "reason for referral": "Reason for Referral",
+    "reason for visit": "Reason for Visit",
+    "social history": "Social History",
+    "subjective": "Subjective",
+    "vitals": "Vitals",
+}
+KNOWN_HEADINGS: frozenset[str] = frozenset(CANONICAL_HEADINGS)
 
 _HEADING_LINE_RE = re.compile(r"^(?P<heading>[^\n:][^\n:]{0,120}):[ \t]*$", re.MULTILINE)
 _NON_NAME_CHARS_RE = re.compile(r"[^a-z0-9]+")
@@ -120,9 +119,10 @@ def normalize_heading(heading: str) -> str:
     if not compact:
         return "Unknown"
 
-    lower = compact.lower()
-    if lower in KNOWN_HEADINGS:
-        return compact.title()
+    normalized = _normalize_heading_key(compact)
+    canonical = CANONICAL_HEADINGS.get(normalized)
+    if canonical:
+        return canonical
 
     return f"Unknown: {compact}"
 
@@ -135,15 +135,17 @@ def _iter_heading_matches(raw_text: str) -> Iterable[re.Match[str]]:
 
 
 def _looks_like_heading(heading: str) -> bool:
-    normalized = " ".join(heading.lower().split())
+    normalized = _normalize_heading_key(heading)
     if normalized in KNOWN_HEADINGS:
         return True
 
-    # Preserve unknown heading-like lines, but avoid treating sentence fragments
-    # with trailing colons as clinical sections.
     words = normalized.split()
     if not words or len(words) > 8:
         return False
 
     slug = _NON_NAME_CHARS_RE.sub("", normalized)
     return bool(slug) and not any(char.isdigit() for char in heading)
+
+
+def _normalize_heading_key(heading: str) -> str:
+    return " ".join(heading.lower().split())
