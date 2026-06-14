@@ -359,7 +359,7 @@ Expected JSON fields:
 - `title`: short description of the note purpose.
 - `data_policy`: must indicate synthetic/demo data.
 - `items`: facts that should be extracted.
-- `should_not_extract`: traps the extractor must avoid.
+- `invalid_extractions`: forbidden outputs the extractor must avoid.
 
 `items` contract:
 
@@ -369,11 +369,11 @@ Expected JSON fields:
 - Every `source_quote` must appear verbatim in the matching note.
 - Items may include type-specific fields such as `dose`, `frequency`, `route`, `value`, `unit`, `relation`, `reaction`, or `status`.
 
-`should_not_extract` contract:
+`invalid_extractions` contract:
 
-- Must describe facts that unsafe extraction might incorrectly produce.
+- Must describe facts or statuses that unsafe extraction might incorrectly produce.
 - Should include a `reason` explaining why extraction would be wrong.
-- Does not require `source_quote`, because traps may describe invalid interpretations rather than desired facts.
+- Does not require `source_quote`, because invalid outputs may describe bad interpretations rather than desired facts. Use `forbidden_status` instead of `status` when the trap is a wrong status.
 
 Data policy:
 
@@ -464,7 +464,7 @@ Golden-set tests:
 - Verify every expected file has a matching note file.
 - Verify every item has `type` and `source_quote`.
 - Verify every `source_quote` appears verbatim in the note.
-- Verify `should_not_extract` is present and non-empty for each expected file.
+- Verify `invalid_extractions` is present and non-empty for each expected file.
 
 Later tests:
 

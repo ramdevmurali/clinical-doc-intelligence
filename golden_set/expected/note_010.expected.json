@@ -102,18 +102,18 @@
       "source_quote": "Pathology report pending."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "bile leak",
-      "status": "active",
-      "reason": "Negated complication"
+      "reason": "Negated complication",
+      "forbidden_status": "active"
     },
     {
       "type": "condition",
       "name": "wound infection",
-      "status": "active",
-      "reason": "Negated complication"
+      "reason": "Negated complication",
+      "forbidden_status": "active"
     }
   ]
 }

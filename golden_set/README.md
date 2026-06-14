@@ -22,6 +22,6 @@ The notes are synthetic and intentionally compact, but each one resembles a real
 ## Labeling Conventions
 
 - `items` contains facts that should be extracted.
-- `should_not_extract` contains traps that a safe extractor should avoid.
+- `invalid_extractions` contains forbidden outputs that a safe extractor should avoid.
 - Every extractable item includes a `source_quote` that appears verbatim in the note.
 - These files use synthetic/demo data only and must not be mixed with real patient records.

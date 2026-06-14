@@ -104,7 +104,7 @@
       "source_quote": "Recheck CBC in one week."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "allergy",
       "name": "latex",
@@ -113,8 +113,8 @@
     {
       "type": "medication",
       "name": "apixaban",
-      "status": "active",
-      "reason": "Stopped medication"
+      "reason": "Stopped medication",
+      "forbidden_status": "active"
     }
   ]
 }

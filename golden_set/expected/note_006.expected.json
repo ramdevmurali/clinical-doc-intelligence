@@ -113,7 +113,7 @@
       "source_quote": "Repeat basic metabolic panel in two weeks."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "hydronephrosis",

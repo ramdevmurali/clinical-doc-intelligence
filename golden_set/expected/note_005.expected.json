@@ -76,12 +76,12 @@
       "source_quote": "Start ferrous sulfate 325 mg every other day."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "procedure",
       "name": "colonoscopy",
-      "status": "performed",
-      "reason": "Not performed; outpatient referral only"
+      "reason": "Not performed; outpatient referral only",
+      "forbidden_status": "performed"
     },
     {
       "type": "condition",

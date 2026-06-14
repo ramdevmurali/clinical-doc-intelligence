@@ -119,7 +119,7 @@
       "source_quote": "Refer for diabetic eye exam."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "thyroid cancer",

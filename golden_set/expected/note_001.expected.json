@@ -96,7 +96,7 @@
       "source_quote": "Follow up with primary care in one week."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "breast cancer",
@@ -110,8 +110,8 @@
     {
       "type": "procedure",
       "name": "circumcision",
-      "status": "performed",
-      "reason": "Explicitly not performed"
+      "reason": "Explicitly not performed",
+      "forbidden_status": "performed"
     }
   ]
 }

@@ -51,9 +51,21 @@ def main() -> None:
                     f"{expected_path}: item {index} source_quote not found: {source_quote}"
                 )
 
-        traps = expected.get("should_not_extract", [])
-        if not isinstance(traps, list) or not traps:
-            errors.append(f"{expected_path}: should_not_extract must be a non-empty list")
+        invalid_extractions = expected.get("invalid_extractions", [])
+        if not isinstance(invalid_extractions, list) or not invalid_extractions:
+            errors.append(f"{expected_path}: invalid_extractions must be a non-empty list")
+        else:
+            for index, invalid in enumerate(invalid_extractions, start=1):
+                if not invalid.get("type"):
+                    errors.append(f"{expected_path}: invalid_extractions {index} missing type")
+                if not invalid.get("name"):
+                    errors.append(f"{expected_path}: invalid_extractions {index} missing name")
+                if not invalid.get("reason"):
+                    errors.append(f"{expected_path}: invalid_extractions {index} missing reason")
+                if "status" in invalid:
+                    errors.append(
+                        f"{expected_path}: invalid_extractions {index} must use forbidden_status, not status"
+                    )
 
     note_count = len(list(NOTES_DIR.glob("note_*.txt")))
     expected_count = len(expected_paths)

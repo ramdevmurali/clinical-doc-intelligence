@@ -115,7 +115,7 @@
       "source_quote": "Monitor renal function."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "myocardial infarction",
@@ -124,8 +124,8 @@
     {
       "type": "condition",
       "name": "focal pneumonia",
-      "status": "active",
-      "reason": "Negative imaging finding"
+      "reason": "Negative imaging finding",
+      "forbidden_status": "active"
     }
   ]
 }

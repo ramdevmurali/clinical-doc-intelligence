@@ -88,18 +88,18 @@
       "source_quote": "Start azithromycin 500 mg today then 250 mg daily for four days."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "malignancy",
-      "status": "active",
-      "reason": "Explicitly low suspicion and not confirmed"
+      "reason": "Explicitly low suspicion and not confirmed",
+      "forbidden_status": "active"
     },
     {
       "type": "condition",
       "name": "pulmonary embolism",
-      "status": "active",
-      "reason": "Negated imaging finding"
+      "reason": "Negated imaging finding",
+      "forbidden_status": "active"
     }
   ]
 }

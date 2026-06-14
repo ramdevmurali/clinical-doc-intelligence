@@ -58,7 +58,7 @@
       "source_quote": "Epinephrine autoinjector prescribed today for shellfish reaction risk."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "allergy",
       "name": "latex",
@@ -67,8 +67,8 @@
     {
       "type": "allergy",
       "name": "iodine",
-      "status": "active",
-      "reason": "Incorrect chart allergy removed"
+      "reason": "Incorrect chart allergy removed",
+      "forbidden_status": "active"
     }
   ]
 }

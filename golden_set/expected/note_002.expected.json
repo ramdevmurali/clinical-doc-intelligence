@@ -97,18 +97,18 @@
       "source_quote": "Ondansetron 4 mg IV given."
     }
   ],
-  "should_not_extract": [
+  "invalid_extractions": [
     {
       "type": "condition",
       "name": "appendicitis",
-      "status": "active",
-      "reason": "Rule-out diagnosis only"
+      "reason": "Rule-out diagnosis only",
+      "forbidden_status": "active"
     },
     {
       "type": "procedure",
       "name": "CT abdomen and pelvis",
-      "status": "performed",
-      "reason": "Ordered, not resulted or performed in note"
+      "reason": "Ordered, not resulted or performed in note",
+      "forbidden_status": "performed"
     }
   ]
 }
