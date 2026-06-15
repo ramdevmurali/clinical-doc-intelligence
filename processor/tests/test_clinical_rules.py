@@ -393,6 +393,159 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertFalse(decision.review_required)
         self.assertEqual((), decision.findings)
 
+    def test_active_medication_discontinued_quote_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="warfarin",
+            status="active",
+            source_quote="Warfarin discontinued due to bleeding risk.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_active_medication_stopped_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="aspirin",
+            status="active",
+            source_quote="Aspirin stopped after gastrointestinal bleed.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_active_medication_was_stopped_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="lisinopril",
+            status="active",
+            source_quote="Lisinopril was stopped due to hypotension.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_active_medication_held_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="metformin",
+            status="active",
+            source_quote="Metformin held while creatinine is elevated.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_active_medication_avoid_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="nsaids",
+            status="active",
+            source_quote="Avoid NSAIDs due to kidney disease.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_inactive_medication_matching_is_case_insensitive(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="warfarin",
+            status="active",
+            source_quote="WARFARIN DISCONTINUED due to bleeding risk.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
+    def test_discontinued_medication_status_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="warfarin",
+            status="discontinued",
+            source_quote="Warfarin discontinued due to bleeding risk.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_held_medication_status_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="metformin",
+            status="held",
+            source_quote="Metformin held while creatinine is elevated.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_stopped_medication_status_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="aspirin",
+            status="stopped",
+            source_quote="Aspirin stopped after gastrointestinal bleed.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_safe_active_medication_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="metformin",
+            status="active",
+            source_quote="Patient takes metformin 500 mg twice daily.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_non_medication_with_inactive_medication_wording_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.ORDER,
+            name="warfarin clinic follow-up",
+            status="ordered",
+            source_quote="Warfarin discontinued; follow-up ordered with anticoagulation clinic.",
+            section_name="Orders",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
     def test_make_finding_preserves_rule_id_severity_and_message(self) -> None:
         finding = make_finding(
             ClinicalRuleId.NEGATED_CONDITION,
@@ -406,6 +559,16 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
 
 
+
+    def assert_inactive_medication_not_active_rejected(self, decision) -> None:
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_INACTIVE_MEDICATION_NOT_ACTIVE", finding.rule_id)
+        self.assertEqual(ValidationSeverity.ERROR, finding.severity)
+        self.assertIn("medication", finding.message)
+        self.assertIn("active", finding.message)
 
     def assert_procedure_not_performed_rejected(self, decision) -> None:
         self.assertEqual(ValidationStatus.REJECTED, decision.status)

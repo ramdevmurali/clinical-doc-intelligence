@@ -55,6 +55,13 @@ _REFERRAL_NOT_PROCEDURE_PHRASES: tuple[str, ...] = (
     "outpatient",
     "ordered",
 )
+_INACTIVE_MEDICATION_PHRASES: tuple[str, ...] = (
+    "discontinued",
+    "stopped",
+    "held",
+    "avoid",
+    "was stopped",
+)
 
 
 def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
@@ -100,6 +107,17 @@ def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
                     ClinicalRuleId.REFERRAL_NOT_PROCEDURE,
                     ValidationSeverity.ERROR,
                     "Referral, order, or outpatient plan must not be accepted as a performed procedure.",
+                )
+            ]
+        )
+
+    if _is_inactive_medication_incorrectly_active(item):
+        return rejected(
+            [
+                make_finding(
+                    ClinicalRuleId.INACTIVE_MEDICATION_NOT_ACTIVE,
+                    ValidationSeverity.ERROR,
+                    "Discontinued, stopped, held, or avoided medication must not be accepted as active.",
                 )
             ]
         )
@@ -164,3 +182,13 @@ def _is_referral_incorrectly_performed_procedure(item: ExtractedClinicalItem) ->
 
 def _is_performed_procedure(item: ExtractedClinicalItem) -> bool:
     return item.item_type == ClinicalItemType.PROCEDURE and item.status == "performed"
+
+
+def _is_inactive_medication_incorrectly_active(item: ExtractedClinicalItem) -> bool:
+    if item.item_type != ClinicalItemType.MEDICATION:
+        return False
+    if item.status != "active":
+        return False
+
+    source_quote = item.source_quote.lower()
+    return any(phrase in source_quote for phrase in _INACTIVE_MEDICATION_PHRASES)
