@@ -51,6 +51,79 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertFalse(decision.review_required)
         self.assertEqual((), decision.findings)
 
+
+    def test_negated_active_condition_denies_is_rejected(self) -> None:
+        item = self.valid_item(name="chest pain", source_quote="Patient denies chest pain.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negated_active_condition_no_evidence_is_rejected(self) -> None:
+        item = self.valid_item(
+            name="diabetic ketoacidosis",
+            source_quote="No evidence of diabetic ketoacidosis.",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negated_active_condition_negative_for_is_rejected(self) -> None:
+        item = self.valid_item(name="pneumonia", source_quote="Review is negative for pneumonia.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negated_active_condition_no_history_of_is_rejected(self) -> None:
+        item = self.valid_item(name="seizure", source_quote="No history of seizure.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negated_active_condition_without_is_rejected(self) -> None:
+        item = self.valid_item(name="fever", source_quote="Patient is without fever.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negated_active_condition_matching_is_case_insensitive(self) -> None:
+        item = self.valid_item(name="chest pain", source_quote="Patient DENIED chest pain.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_negative_finding_with_negated_quote_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.NEGATIVE_FINDING,
+            name="chest pain",
+            status=None,
+            source_quote="Patient denies chest pain.",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_non_active_condition_with_negated_quote_is_not_rejected_by_negation_rule(self) -> None:
+        item = self.valid_item(
+            name="chest pain",
+            status="resolved",
+            source_quote="Patient denies chest pain.",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
     def test_make_finding_preserves_rule_id_severity_and_message(self) -> None:
         finding = make_finding(
             ClinicalRuleId.NEGATED_CONDITION,
@@ -61,6 +134,17 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertEqual("RULE_NEGATED_CONDITION", finding.rule_id)
         self.assertEqual(ValidationSeverity.ERROR, finding.severity)
         self.assertEqual("Negated condition should not be accepted as active.", finding.message)
+
+
+    def assert_negated_condition_rejected(self, decision) -> None:
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_NEGATED_CONDITION", finding.rule_id)
+        self.assertEqual(ValidationSeverity.ERROR, finding.severity)
+        self.assertIn("Negated mention", finding.message)
+        self.assertIn("active condition", finding.message)
 
     def valid_item(self, **overrides) -> ExtractedClinicalItem:
         values = {

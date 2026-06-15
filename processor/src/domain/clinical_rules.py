@@ -1,15 +1,16 @@
-"""Deterministic clinical validation rule contract."""
+"""Deterministic clinical validation rules."""
 
 from __future__ import annotations
 
 from enum import StrEnum
 
-from processor.src.domain.extraction_schema import ExtractedClinicalItem
+from processor.src.domain.extraction_schema import ClinicalItemType, ExtractedClinicalItem
 from processor.src.domain.validation import (
     ValidationDecision,
     ValidationFinding,
     ValidationSeverity,
     accepted,
+    rejected,
 )
 
 
@@ -24,13 +25,29 @@ class ClinicalRuleId(StrEnum):
     LOW_CONFIDENCE = "RULE_LOW_CONFIDENCE"
 
 
-def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
-    """Validate one extracted clinical item using deterministic clinical rules.
+_NEGATED_CONDITION_PHRASES: tuple[str, ...] = (
+    "denies",
+    "denied",
+    "no evidence of",
+    "negative for",
+    "no history of",
+    "without",
+)
 
-    Specific clinical safety rules are intentionally not implemented in this
-    contract step. The public entrypoint exists so future rules can be composed
-    behind a stable API.
-    """
+
+def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
+    """Validate one extracted clinical item using deterministic clinical rules."""
+
+    if _is_negated_active_condition(item):
+        return rejected(
+            [
+                make_finding(
+                    ClinicalRuleId.NEGATED_CONDITION,
+                    ValidationSeverity.ERROR,
+                    "Negated mention must not be accepted as an active condition.",
+                )
+            ]
+        )
 
     return accepted()
 
@@ -47,3 +64,13 @@ def make_finding(
         severity=severity,
         message=message,
     )
+
+
+def _is_negated_active_condition(item: ExtractedClinicalItem) -> bool:
+    if item.item_type != ClinicalItemType.CONDITION:
+        return False
+    if item.status != "active":
+        return False
+
+    source_quote = item.source_quote.lower()
+    return any(phrase in source_quote for phrase in _NEGATED_CONDITION_PHRASES)
