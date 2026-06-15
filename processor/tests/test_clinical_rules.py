@@ -124,6 +124,275 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertFalse(decision.review_required)
         self.assertEqual((), decision.findings)
 
+
+    def test_condition_from_family_history_section_is_rejected(self) -> None:
+        item = self.valid_item(
+            name="breast cancer",
+            source_quote="Breast cancer noted in family history.",
+            section_name="Family History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_condition_with_mother_relation_is_rejected(self) -> None:
+        item = self.valid_item(name="breast cancer", source_quote="Mother had breast cancer.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_condition_with_father_relation_is_rejected(self) -> None:
+        item = self.valid_item(name="coronary artery disease", source_quote="Father has coronary artery disease.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_condition_with_sister_relation_is_rejected(self) -> None:
+        item = self.valid_item(name="thyroid cancer", source_quote="Sister has thyroid cancer.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_condition_with_brother_relation_is_rejected(self) -> None:
+        item = self.valid_item(name="myocardial infarction", source_quote="Brother died of myocardial infarction.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_condition_with_family_history_phrase_is_rejected(self) -> None:
+        item = self.valid_item(name="colon cancer", source_quote="Family history is notable for colon cancer.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_family_history_matching_is_case_insensitive(self) -> None:
+        item = self.valid_item(name="breast cancer", source_quote="MOTHER had breast cancer.")
+
+        decision = validate_clinical_item(item)
+
+        self.assert_family_history_condition_rejected(decision)
+
+    def test_family_history_item_with_relation_quote_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.FAMILY_HISTORY,
+            name="breast cancer",
+            status="historical",
+            source_quote="Mother had breast cancer.",
+            section_name="Family History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_safe_active_condition_outside_family_history_is_accepted(self) -> None:
+        item = self.valid_item(
+            name="hypertension",
+            source_quote="Past medical history includes hypertension.",
+            section_name="Past Medical History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_negation_rule_runs_before_family_history_rule(self) -> None:
+        item = self.valid_item(
+            name="seizure",
+            source_quote="No history of seizure in mother.",
+            section_name="Family History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+
+    def test_performed_procedure_not_performed_quote_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="circumcision",
+            status="performed",
+            source_quote="Circumcision was not performed.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_performed_procedure_not_performed_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="biopsy",
+            status="performed",
+            source_quote="The biopsy was not performed due to patient preference.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_performed_procedure_declined_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="colonoscopy",
+            status="performed",
+            source_quote="Patient declined colonoscopy.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_performed_procedure_cancelled_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="surgery",
+            status="performed",
+            source_quote="Surgery was cancelled before incision.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_performed_procedure_planned_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="knee replacement",
+            status="performed",
+            source_quote="Knee replacement is planned for next month.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_procedure_not_performed_matching_is_case_insensitive(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="circumcision",
+            status="performed",
+            source_quote="Circumcision was NOT PERFORMED.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_procedure_not_performed_rejected(decision)
+
+    def test_performed_procedure_referred_for_quote_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="outpatient colonoscopy",
+            status="performed",
+            source_quote="Patient referred for outpatient colonoscopy.",
+            section_name="Orders and Referrals",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_referral_not_procedure_rejected(decision)
+
+    def test_performed_procedure_referral_for_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="colonoscopy",
+            status="performed",
+            source_quote="Referral for colonoscopy was placed.",
+            section_name="Orders and Referrals",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_referral_not_procedure_rejected(decision)
+
+    def test_performed_procedure_referred_to_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="cardiac catheterization",
+            status="performed",
+            source_quote="Patient was referred to cardiology for cardiac catheterization.",
+            section_name="Orders and Referrals",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_referral_not_procedure_rejected(decision)
+
+    def test_performed_procedure_ordered_phrase_is_rejected(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="CT abdomen and pelvis",
+            status="performed",
+            source_quote="CT abdomen and pelvis ordered.",
+            section_name="Orders",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_referral_not_procedure_rejected(decision)
+
+    def test_not_performed_procedure_with_not_performed_status_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="circumcision",
+            status="not_performed",
+            source_quote="Circumcision was not performed.",
+            section_name="Procedures",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_referred_order_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.ORDER,
+            name="outpatient colonoscopy",
+            status="referred",
+            source_quote="Patient referred for outpatient colonoscopy.",
+            section_name="Orders and Referrals",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_safe_performed_procedure_is_accepted(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="appendectomy",
+            status="performed",
+            source_quote="Appendectomy was performed in 2018.",
+            section_name="Past Surgical History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
     def test_make_finding_preserves_rule_id_severity_and_message(self) -> None:
         finding = make_finding(
             ClinicalRuleId.NEGATED_CONDITION,
@@ -135,6 +404,36 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertEqual(ValidationSeverity.ERROR, finding.severity)
         self.assertEqual("Negated condition should not be accepted as active.", finding.message)
 
+
+
+
+    def assert_procedure_not_performed_rejected(self, decision) -> None:
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_PROCEDURE_NOT_PERFORMED", finding.rule_id)
+        self.assertEqual(ValidationSeverity.ERROR, finding.severity)
+        self.assertIn("must not be accepted as performed", finding.message)
+
+    def assert_referral_not_procedure_rejected(self, decision) -> None:
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_REFERRAL_NOT_PROCEDURE", finding.rule_id)
+        self.assertEqual(ValidationSeverity.ERROR, finding.severity)
+        self.assertIn("must not be accepted as a performed procedure", finding.message)
+
+    def assert_family_history_condition_rejected(self, decision) -> None:
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_FAMILY_HISTORY_NOT_PATIENT_CONDITION", finding.rule_id)
+        self.assertEqual(ValidationSeverity.ERROR, finding.severity)
+        self.assertIn("Family-history mention", finding.message)
+        self.assertIn("patient condition", finding.message)
 
     def assert_negated_condition_rejected(self, decision) -> None:
         self.assertEqual(ValidationStatus.REJECTED, decision.status)
