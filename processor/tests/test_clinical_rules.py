@@ -210,7 +210,7 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertFalse(decision.review_required)
         self.assertEqual((), decision.findings)
 
-    def test_negation_rule_runs_before_family_history_rule(self) -> None:
+    def test_negation_finding_is_ordered_before_family_history_finding(self) -> None:
         item = self.valid_item(
             name="seizure",
             source_quote="No history of seizure in mother.",
@@ -219,7 +219,12 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
         decision = validate_clinical_item(item)
 
-        self.assert_negated_condition_rejected(decision)
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(
+            ["RULE_NEGATED_CONDITION", "RULE_FAMILY_HISTORY_NOT_PATIENT_CONDITION"],
+            self.finding_rule_ids(decision),
+        )
 
 
     def test_performed_procedure_not_performed_quote_is_rejected(self) -> None:
@@ -556,6 +561,7 @@ class ClinicalRulesContractTests(unittest.TestCase):
         decision = validate_clinical_item(item)
 
         self.assert_low_confidence_needs_review(decision)
+        self.assertEqual(["RULE_LOW_CONFIDENCE"], self.finding_rule_ids(decision))
 
     def test_low_confidence_threshold_value_is_accepted(self) -> None:
         item = self.valid_item(confidence=0.75)
@@ -593,7 +599,12 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
         decision = validate_clinical_item(item)
 
-        self.assert_negated_condition_rejected(decision)
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(
+            ["RULE_NEGATED_CONDITION", "RULE_LOW_CONFIDENCE"],
+            self.finding_rule_ids(decision),
+        )
 
     def test_inactive_medication_rejection_takes_precedence_over_low_confidence(self) -> None:
         item = self.valid_item(
@@ -607,7 +618,50 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
         decision = validate_clinical_item(item)
 
-        self.assert_inactive_medication_not_active_rejected(decision)
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(
+            ["RULE_INACTIVE_MEDICATION_NOT_ACTIVE", "RULE_LOW_CONFIDENCE"],
+            self.finding_rule_ids(decision),
+        )
+
+    def test_multiple_applicable_findings_are_preserved_in_deterministic_order(self) -> None:
+        item = self.valid_item(
+            name="breast cancer",
+            confidence=0.50,
+            source_quote="Mother denies breast cancer.",
+            section_name="Family History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual(
+            [
+                "RULE_NEGATED_CONDITION",
+                "RULE_FAMILY_HISTORY_NOT_PATIENT_CONDITION",
+                "RULE_LOW_CONFIDENCE",
+            ],
+            self.finding_rule_ids(decision),
+        )
+        self.assertEqual(
+            [
+                ValidationSeverity.ERROR,
+                ValidationSeverity.ERROR,
+                ValidationSeverity.WARNING,
+            ],
+            [finding.severity for finding in decision.findings],
+        )
+
+    def test_accepted_item_has_no_error_findings(self) -> None:
+        item = self.valid_item(confidence=0.90)
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertEqual((), decision.findings)
+        self.assertFalse(any(finding.severity == ValidationSeverity.ERROR for finding in decision.findings))
 
     def test_make_finding_preserves_rule_id_severity_and_message(self) -> None:
         finding = make_finding(
@@ -632,6 +686,9 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertEqual(ValidationSeverity.WARNING, finding.severity)
         self.assertIn("confidence", finding.message)
         self.assertIn("review", finding.message)
+
+    def finding_rule_ids(self, decision) -> list[str]:
+        return [finding.rule_id for finding in decision.findings]
 
     def assert_inactive_medication_not_active_rejected(self, decision) -> None:
         self.assertEqual(ValidationStatus.REJECTED, decision.status)

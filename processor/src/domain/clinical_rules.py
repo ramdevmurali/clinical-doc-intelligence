@@ -69,73 +69,76 @@ LOW_CONFIDENCE_THRESHOLD = 0.75
 def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
     """Validate one extracted clinical item using deterministic clinical rules."""
 
+    findings = _collect_findings(item)
+    if not findings:
+        return accepted()
+    if _has_rejection_finding(findings):
+        return rejected(findings)
+    return needs_review(findings)
+
+
+def _collect_findings(item: ExtractedClinicalItem) -> tuple[ValidationFinding, ...]:
+    findings: list[ValidationFinding] = []
+
     if _is_negated_active_condition(item):
-        return rejected(
-            [
-                make_finding(
-                    ClinicalRuleId.NEGATED_CONDITION,
-                    ValidationSeverity.ERROR,
-                    "Negated mention must not be accepted as an active condition.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.NEGATED_CONDITION,
+                ValidationSeverity.ERROR,
+                "Negated mention must not be accepted as an active condition.",
+            )
         )
 
     if _is_family_history_patient_condition(item):
-        return rejected(
-            [
-                make_finding(
-                    ClinicalRuleId.FAMILY_HISTORY_NOT_PATIENT_CONDITION,
-                    ValidationSeverity.ERROR,
-                    "Family-history mention must not be accepted as a patient condition.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.FAMILY_HISTORY_NOT_PATIENT_CONDITION,
+                ValidationSeverity.ERROR,
+                "Family-history mention must not be accepted as a patient condition.",
+            )
         )
 
     if _is_performed_procedure_not_performed(item):
-        return rejected(
-            [
-                make_finding(
-                    ClinicalRuleId.PROCEDURE_NOT_PERFORMED,
-                    ValidationSeverity.ERROR,
-                    "Not-performed, declined, cancelled, or planned procedure must not be accepted as performed.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.PROCEDURE_NOT_PERFORMED,
+                ValidationSeverity.ERROR,
+                "Not-performed, declined, cancelled, or planned procedure must not be accepted as performed.",
+            )
         )
 
     if _is_referral_incorrectly_performed_procedure(item):
-        return rejected(
-            [
-                make_finding(
-                    ClinicalRuleId.REFERRAL_NOT_PROCEDURE,
-                    ValidationSeverity.ERROR,
-                    "Referral, order, or outpatient plan must not be accepted as a performed procedure.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.REFERRAL_NOT_PROCEDURE,
+                ValidationSeverity.ERROR,
+                "Referral, order, or outpatient plan must not be accepted as a performed procedure.",
+            )
         )
 
     if _is_inactive_medication_incorrectly_active(item):
-        return rejected(
-            [
-                make_finding(
-                    ClinicalRuleId.INACTIVE_MEDICATION_NOT_ACTIVE,
-                    ValidationSeverity.ERROR,
-                    "Discontinued, stopped, held, or avoided medication must not be accepted as active.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.INACTIVE_MEDICATION_NOT_ACTIVE,
+                ValidationSeverity.ERROR,
+                "Discontinued, stopped, held, or avoided medication must not be accepted as active.",
+            )
         )
 
     if _is_low_confidence(item):
-        return needs_review(
-            [
-                make_finding(
-                    ClinicalRuleId.LOW_CONFIDENCE,
-                    ValidationSeverity.WARNING,
-                    "Item confidence is below the review threshold and requires human review.",
-                )
-            ]
+        findings.append(
+            make_finding(
+                ClinicalRuleId.LOW_CONFIDENCE,
+                ValidationSeverity.WARNING,
+                "Item confidence is below the review threshold and requires human review.",
+            )
         )
 
-    return accepted()
+    return tuple(findings)
+
+
+def _has_rejection_finding(findings: tuple[ValidationFinding, ...]) -> bool:
+    return any(finding.severity == ValidationSeverity.ERROR for finding in findings)
 
 
 def make_finding(
