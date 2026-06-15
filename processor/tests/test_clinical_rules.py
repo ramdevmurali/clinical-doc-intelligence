@@ -2,6 +2,7 @@ import unittest
 
 from processor.src.domain.clinical_rules import (
     ClinicalRuleId,
+    LOW_CONFIDENCE_THRESHOLD,
     make_finding,
     validate_clinical_item,
 )
@@ -36,6 +37,9 @@ class ClinicalRulesContractTests(unittest.TestCase):
             },
             {rule_id.value for rule_id in ClinicalRuleId},
         )
+
+    def test_low_confidence_threshold_is_stable(self) -> None:
+        self.assertEqual(0.75, LOW_CONFIDENCE_THRESHOLD)
 
     def test_validate_clinical_item_accepts_safe_active_condition_by_default(self) -> None:
         item = self.valid_item(
@@ -546,6 +550,65 @@ class ClinicalRulesContractTests(unittest.TestCase):
         self.assertFalse(decision.review_required)
         self.assertEqual((), decision.findings)
 
+    def test_low_confidence_item_requires_review(self) -> None:
+        item = self.valid_item(confidence=0.74)
+
+        decision = validate_clinical_item(item)
+
+        self.assert_low_confidence_needs_review(decision)
+
+    def test_low_confidence_threshold_value_is_accepted(self) -> None:
+        item = self.valid_item(confidence=0.75)
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_high_confidence_item_is_accepted(self) -> None:
+        item = self.valid_item(confidence=0.90)
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_missing_confidence_does_not_trigger_review(self) -> None:
+        item = self.valid_item(confidence=None)
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.ACCEPTED, decision.status)
+        self.assertFalse(decision.review_required)
+        self.assertEqual((), decision.findings)
+
+    def test_negated_condition_rejection_takes_precedence_over_low_confidence(self) -> None:
+        item = self.valid_item(
+            name="chest pain",
+            confidence=0.50,
+            source_quote="Patient denies chest pain.",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_negated_condition_rejected(decision)
+
+    def test_inactive_medication_rejection_takes_precedence_over_low_confidence(self) -> None:
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="warfarin",
+            status="active",
+            confidence=0.50,
+            source_quote="Warfarin discontinued due to bleeding risk.",
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assert_inactive_medication_not_active_rejected(decision)
+
     def test_make_finding_preserves_rule_id_severity_and_message(self) -> None:
         finding = make_finding(
             ClinicalRuleId.NEGATED_CONDITION,
@@ -559,6 +622,16 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
 
 
+
+    def assert_low_confidence_needs_review(self, decision) -> None:
+        self.assertEqual(ValidationStatus.NEEDS_REVIEW, decision.status)
+        self.assertTrue(decision.review_required)
+        self.assertEqual(1, len(decision.findings))
+        finding = decision.findings[0]
+        self.assertEqual("RULE_LOW_CONFIDENCE", finding.rule_id)
+        self.assertEqual(ValidationSeverity.WARNING, finding.severity)
+        self.assertIn("confidence", finding.message)
+        self.assertIn("review", finding.message)
 
     def assert_inactive_medication_not_active_rejected(self, decision) -> None:
         self.assertEqual(ValidationStatus.REJECTED, decision.status)

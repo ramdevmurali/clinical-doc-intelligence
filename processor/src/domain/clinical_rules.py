@@ -11,6 +11,7 @@ from processor.src.domain.validation import (
     ValidationFinding,
     ValidationSeverity,
     accepted,
+    needs_review,
     rejected,
 )
 
@@ -62,6 +63,7 @@ _INACTIVE_MEDICATION_PHRASES: tuple[str, ...] = (
     "avoid",
     "was stopped",
 )
+LOW_CONFIDENCE_THRESHOLD = 0.75
 
 
 def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
@@ -118,6 +120,17 @@ def validate_clinical_item(item: ExtractedClinicalItem) -> ValidationDecision:
                     ClinicalRuleId.INACTIVE_MEDICATION_NOT_ACTIVE,
                     ValidationSeverity.ERROR,
                     "Discontinued, stopped, held, or avoided medication must not be accepted as active.",
+                )
+            ]
+        )
+
+    if _is_low_confidence(item):
+        return needs_review(
+            [
+                make_finding(
+                    ClinicalRuleId.LOW_CONFIDENCE,
+                    ValidationSeverity.WARNING,
+                    "Item confidence is below the review threshold and requires human review.",
                 )
             ]
         )
@@ -192,3 +205,7 @@ def _is_inactive_medication_incorrectly_active(item: ExtractedClinicalItem) -> b
 
     source_quote = item.source_quote.lower()
     return any(phrase in source_quote for phrase in _INACTIVE_MEDICATION_PHRASES)
+
+
+def _is_low_confidence(item: ExtractedClinicalItem) -> bool:
+    return item.confidence is not None and item.confidence < LOW_CONFIDENCE_THRESHOLD
