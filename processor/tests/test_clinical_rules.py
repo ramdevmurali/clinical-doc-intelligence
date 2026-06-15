@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import unittest
 
 from processor.src.domain.clinical_rules import (
@@ -40,6 +42,114 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
     def test_low_confidence_threshold_is_stable(self) -> None:
         self.assertEqual(0.75, LOW_CONFIDENCE_THRESHOLD)
+
+    def test_golden_trap_performed_circumcision_is_rejected(self) -> None:
+        self.assert_golden_invalid_trap(
+            note_id="note_001",
+            item_type="procedure",
+            name="circumcision",
+            forbidden_status="performed",
+        )
+        source_quote = "Circumcision was not performed."
+        self.assertIn(source_quote, self.golden_note_text("note_001"))
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="circumcision",
+            status="performed",
+            source_quote=source_quote,
+            section_name="Hospital Course",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertIn("RULE_PROCEDURE_NOT_PERFORMED", self.finding_rule_ids(decision))
+
+    def test_golden_trap_active_chest_pain_is_rejected(self) -> None:
+        self.assert_golden_invalid_trap(
+            note_id="note_001",
+            item_type="condition",
+            name="chest pain",
+        )
+        source_quote = "Patient denies chest pain and denies shortness of breath."
+        self.assertIn(source_quote, self.golden_note_text("note_001"))
+        item = self.valid_item(
+            item_type=ClinicalItemType.CONDITION,
+            name="chest pain",
+            status="active",
+            source_quote=source_quote,
+            section_name="History of Present Illness",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertIn("RULE_NEGATED_CONDITION", self.finding_rule_ids(decision))
+
+    def test_golden_trap_active_family_history_breast_cancer_is_rejected(self) -> None:
+        self.assert_golden_invalid_trap(
+            note_id="note_001",
+            item_type="condition",
+            name="breast cancer",
+        )
+        source_quote = "Mother had breast cancer."
+        self.assertIn(source_quote, self.golden_note_text("note_001"))
+        item = self.valid_item(
+            item_type=ClinicalItemType.CONDITION,
+            name="breast cancer",
+            status="active",
+            source_quote=source_quote,
+            section_name="Family History",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertIn("RULE_FAMILY_HISTORY_NOT_PATIENT_CONDITION", self.finding_rule_ids(decision))
+
+    def test_golden_trap_performed_outpatient_colonoscopy_referral_is_rejected(self) -> None:
+        self.assert_golden_invalid_trap(
+            note_id="note_005",
+            item_type="procedure",
+            name="colonoscopy",
+            forbidden_status="performed",
+        )
+        source_quote = "Patient referred for outpatient colonoscopy."
+        self.assertIn(source_quote, self.golden_note_text("note_005"))
+        item = self.valid_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name="colonoscopy",
+            status="performed",
+            source_quote=source_quote,
+            section_name="Plan",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertIn("RULE_REFERRAL_NOT_PROCEDURE", self.finding_rule_ids(decision))
+
+    def test_golden_trap_active_stopped_apixaban_is_rejected(self) -> None:
+        self.assert_golden_invalid_trap(
+            note_id="note_004",
+            item_type="medication",
+            name="apixaban",
+            forbidden_status="active",
+        )
+        source_quote = "Apixaban 5 mg twice daily was stopped last week after melena."
+        self.assertIn(source_quote, self.golden_note_text("note_004"))
+        item = self.valid_item(
+            item_type=ClinicalItemType.MEDICATION,
+            name="apixaban",
+            status="active",
+            source_quote=source_quote,
+            section_name="Medications",
+        )
+
+        decision = validate_clinical_item(item)
+
+        self.assertEqual(ValidationStatus.REJECTED, decision.status)
+        self.assertIn("RULE_INACTIVE_MEDICATION_NOT_ACTIVE", self.finding_rule_ids(decision))
 
     def test_validate_clinical_item_accepts_safe_active_condition_by_default(self) -> None:
         item = self.valid_item(
@@ -689,6 +799,36 @@ class ClinicalRulesContractTests(unittest.TestCase):
 
     def finding_rule_ids(self, decision) -> list[str]:
         return [finding.rule_id for finding in decision.findings]
+
+    def assert_golden_invalid_trap(
+        self,
+        note_id: str,
+        item_type: str,
+        name: str,
+        forbidden_status: str | None = None,
+    ) -> None:
+        invalid_extractions = self.golden_expected(note_id).get("invalid_extractions", [])
+        for trap in invalid_extractions:
+            if trap.get("type") != item_type:
+                continue
+            if trap.get("name") != name:
+                continue
+            if forbidden_status is not None and trap.get("forbidden_status") != forbidden_status:
+                continue
+            return
+        self.fail(f"Missing golden invalid extraction trap for {note_id}: {item_type} {name}")
+
+    def golden_expected(self, note_id: str) -> dict:
+        path = self.repo_root() / "golden_set" / "expected" / f"{note_id}.expected.json"
+        with path.open() as expected_file:
+            return json.load(expected_file)
+
+    def golden_note_text(self, note_id: str) -> str:
+        path = self.repo_root() / "golden_set" / "notes" / f"{note_id}.txt"
+        return path.read_text()
+
+    def repo_root(self) -> Path:
+        return Path(__file__).resolve().parents[2]
 
     def assert_inactive_medication_not_active_rejected(self, decision) -> None:
         self.assertEqual(ValidationStatus.REJECTED, decision.status)
