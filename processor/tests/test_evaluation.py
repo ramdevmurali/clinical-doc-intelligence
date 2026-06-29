@@ -1,3 +1,6 @@
+import copy
+import json
+from pathlib import Path
 import unittest
 from dataclasses import FrozenInstanceError
 
@@ -8,6 +11,8 @@ from processor.src.domain.evaluation import (
     ExpectedClinicalItem,
     InvalidExtractionTrap,
     ItemMatch,
+    expected_items_from_json,
+    invalid_traps_from_json,
 )
 
 
@@ -225,6 +230,209 @@ class EvaluationModelTests(unittest.TestCase):
         with self.assertRaises(EvaluationError):
             self.empty_result(extra_predicted_indexes=[-1])
 
+    def test_expected_items_from_json_parses_full_item(self) -> None:
+        expected_json = {
+            "items": [
+                {
+                    "type": "condition",
+                    "name": "hypertension",
+                    "status": "active",
+                    "source_quote": "Hypertension.",
+                }
+            ]
+        }
+
+        items = expected_items_from_json(expected_json)
+
+        self.assertEqual(
+            (
+                ExpectedClinicalItem(
+                    item_type="condition",
+                    name="hypertension",
+                    status="active",
+                    source_quote="Hypertension.",
+                ),
+            ),
+            items,
+        )
+
+    def test_expected_items_from_json_parses_minimal_item(self) -> None:
+        items = expected_items_from_json({"items": [{"type": "condition", "name": "hypertension"}]})
+
+        self.assertEqual((ExpectedClinicalItem(item_type="condition", name="hypertension"),), items)
+
+    def test_expected_items_from_json_rejects_family_history_condition_without_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json(
+                {
+                    "items": [
+                        {
+                            "type": "family_history",
+                            "condition": "breast cancer",
+                            "relation": "mother",
+                            "source_quote": "Mother had breast cancer.",
+                        }
+                    ]
+                }
+            )
+
+    def test_expected_items_from_json_missing_or_empty_items_returns_empty_tuple(self) -> None:
+        self.assertEqual((), expected_items_from_json({}))
+        self.assertEqual((), expected_items_from_json({"items": []}))
+
+    def test_expected_items_from_json_ignores_extra_fields_without_mutating_input(self) -> None:
+        expected_json = {
+            "items": [
+                {
+                    "type": "family_history",
+                    "name": "breast cancer",
+                    "relation": "mother",
+                    "confidence": 0.9,
+                }
+            ]
+        }
+        original = copy.deepcopy(expected_json)
+
+        items = expected_items_from_json(expected_json)
+
+        self.assertEqual((ExpectedClinicalItem(item_type="family_history", name="breast cancer"),), items)
+        self.assertEqual(original, expected_json)
+
+    def test_expected_items_from_json_rejects_non_dict_expected_json(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json([])
+
+    def test_expected_items_from_json_rejects_non_collection_items(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": "not a list"})
+
+    def test_expected_items_from_json_rejects_non_dict_item_entry(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": ["not a dict"]})
+
+    def test_expected_items_from_json_rejects_item_missing_type(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": [{"name": "hypertension"}]})
+
+    def test_expected_items_from_json_rejects_item_missing_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": [{"type": "condition"}]})
+
+    def test_expected_items_from_json_rejects_empty_or_whitespace_type_and_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": [{"type": "", "name": "hypertension"}]})
+        with self.assertRaises(EvaluationError):
+            expected_items_from_json({"items": [{"type": "condition", "name": "   "}]})
+
+    def test_invalid_traps_from_json_parses_full_trap(self) -> None:
+        expected_json = {
+            "invalid_extractions": [
+                {
+                    "type": "procedure",
+                    "name": "circumcision",
+                    "forbidden_status": "performed",
+                    "reason": "Explicitly not performed",
+                }
+            ]
+        }
+
+        traps = invalid_traps_from_json(expected_json)
+
+        self.assertEqual(
+            (
+                InvalidExtractionTrap(
+                    item_type="procedure",
+                    name="circumcision",
+                    forbidden_status="performed",
+                    reason="Explicitly not performed",
+                ),
+            ),
+            traps,
+        )
+
+    def test_invalid_traps_from_json_parses_minimal_trap(self) -> None:
+        traps = invalid_traps_from_json(
+            {"invalid_extractions": [{"type": "condition", "name": "chest pain"}]}
+        )
+
+        self.assertEqual((InvalidExtractionTrap(item_type="condition", name="chest pain"),), traps)
+
+    def test_invalid_traps_from_json_missing_or_empty_traps_returns_empty_tuple(self) -> None:
+        self.assertEqual((), invalid_traps_from_json({}))
+        self.assertEqual((), invalid_traps_from_json({"invalid_extractions": []}))
+
+    def test_invalid_traps_from_json_ignores_extra_fields_without_mutating_input(self) -> None:
+        expected_json = {
+            "invalid_extractions": [
+                {
+                    "type": "condition",
+                    "name": "breast cancer",
+                    "reason": "Family history only",
+                    "extra": "ignored",
+                }
+            ]
+        }
+        original = copy.deepcopy(expected_json)
+
+        traps = invalid_traps_from_json(expected_json)
+
+        self.assertEqual(
+            (
+                InvalidExtractionTrap(
+                    item_type="condition",
+                    name="breast cancer",
+                    reason="Family history only",
+                ),
+            ),
+            traps,
+        )
+        self.assertEqual(original, expected_json)
+
+    def test_invalid_traps_from_json_rejects_non_dict_expected_json(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json([])
+
+    def test_invalid_traps_from_json_rejects_non_collection_traps(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": "not a list"})
+
+    def test_invalid_traps_from_json_rejects_non_dict_trap_entry(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": ["not a dict"]})
+
+    def test_invalid_traps_from_json_rejects_trap_missing_type(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": [{"name": "chest pain"}]})
+
+    def test_invalid_traps_from_json_rejects_trap_missing_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": [{"type": "condition"}]})
+
+    def test_invalid_traps_from_json_rejects_empty_or_whitespace_type_and_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": [{"type": "", "name": "chest pain"}]})
+        with self.assertRaises(EvaluationError):
+            invalid_traps_from_json({"invalid_extractions": [{"type": "condition", "name": "   "}]})
+
+    def test_current_golden_expected_json_files_parse_without_errors(self) -> None:
+        expected_paths = sorted((self.repo_root() / "golden_set" / "expected").glob("*.expected.json"))
+        self.assertTrue(expected_paths)
+
+        for expected_path in expected_paths:
+            with self.subTest(expected_path=expected_path.name):
+                with expected_path.open() as expected_file:
+                    expected_json = json.load(expected_file)
+
+                expected_items = expected_items_from_json(expected_json)
+                invalid_traps = invalid_traps_from_json(expected_json)
+
+                for item in expected_items:
+                    self.assertTrue(item.item_type.strip())
+                    self.assertTrue(item.name.strip())
+                for trap in invalid_traps:
+                    self.assertTrue(trap.item_type.strip())
+                    self.assertTrue(trap.name.strip())
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -237,6 +445,9 @@ class EvaluationModelTests(unittest.TestCase):
         }
         values.update(overrides)
         return EvaluationResult(**values)
+
+    def repo_root(self) -> Path:
+        return Path(__file__).resolve().parents[2]
 
 
 if __name__ == "__main__":

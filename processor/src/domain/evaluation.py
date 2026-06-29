@@ -131,6 +131,64 @@ class EvaluationResult:
         object.__setattr__(self, "source_quote_failures", source_quote_failures)
 
 
+def expected_items_from_json(expected_json: dict) -> tuple[ExpectedClinicalItem, ...]:
+    """Parse golden expected items into evaluation domain objects."""
+
+    _require_mapping(expected_json, "expected_json")
+    raw_items = _optional_collection(expected_json, "items")
+    return tuple(
+        ExpectedClinicalItem(
+            item_type=_required_field(raw_item, "type", f"items[{index}]"),
+            name=_required_field(raw_item, "name", f"items[{index}]"),
+            status=raw_item.get("status"),
+            source_quote=raw_item.get("source_quote"),
+        )
+        for index, raw_item in enumerate(raw_items)
+    )
+
+
+def invalid_traps_from_json(expected_json: dict) -> tuple[InvalidExtractionTrap, ...]:
+    """Parse golden invalid extraction traps into evaluation domain objects."""
+
+    _require_mapping(expected_json, "expected_json")
+    raw_traps = _optional_collection(expected_json, "invalid_extractions")
+    return tuple(
+        InvalidExtractionTrap(
+            item_type=_required_field(raw_trap, "type", f"invalid_extractions[{index}]"),
+            name=_required_field(raw_trap, "name", f"invalid_extractions[{index}]"),
+            forbidden_status=raw_trap.get("forbidden_status"),
+            reason=raw_trap.get("reason"),
+        )
+        for index, raw_trap in enumerate(raw_traps)
+    )
+
+
+def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:
+    raw_values = expected_json.get(key, ())
+    if not isinstance(raw_values, (list, tuple)):
+        raise EvaluationError(f"expected_json {key} must be a list or tuple when provided.")
+
+    values = []
+    for index, raw_value in enumerate(raw_values):
+        context = f"{key}[{index}]"
+        _require_mapping(raw_value, context)
+        values.append(raw_value)
+    return tuple(values)
+
+
+def _required_field(raw_item: dict, field_name: str, context: str) -> str:
+    if field_name not in raw_item:
+        raise EvaluationError(f"{context} is missing required field {field_name}.")
+    value = raw_item[field_name]
+    _require_non_empty_string(value, f"{context} {field_name}")
+    return value
+
+
+def _require_mapping(value: object, field_name: str) -> None:
+    if not isinstance(value, dict):
+        raise EvaluationError(f"{field_name} must be a dictionary.")
+
+
 def _require_non_empty_string(value: str, field_name: str) -> None:
     if not isinstance(value, str) or not value.strip():
         raise EvaluationError(f"{field_name} is required.")

@@ -33,9 +33,9 @@
     },
     {
       "type": "family_history",
-      "condition": "myocardial infarction",
       "relation": "brother",
-      "source_quote": "Brother died of myocardial infarction at age 52."
+      "source_quote": "Brother died of myocardial infarction at age 52.",
+      "name": "myocardial infarction"
     },
     {
       "type": "observation",

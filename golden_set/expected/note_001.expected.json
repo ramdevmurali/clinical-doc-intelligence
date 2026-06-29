@@ -45,15 +45,15 @@
     },
     {
       "type": "family_history",
-      "condition": "breast cancer",
       "relation": "mother",
-      "source_quote": "Mother had breast cancer."
+      "source_quote": "Mother had breast cancer.",
+      "name": "breast cancer"
     },
     {
       "type": "family_history",
-      "condition": "coronary artery disease",
       "relation": "father",
-      "source_quote": "Father has coronary artery disease."
+      "source_quote": "Father has coronary artery disease.",
+      "name": "coronary artery disease"
     },
     {
       "type": "allergy",

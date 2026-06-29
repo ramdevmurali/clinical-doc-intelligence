@@ -33,9 +33,9 @@
     },
     {
       "type": "family_history",
-      "condition": "colon cancer",
       "relation": "father",
-      "source_quote": "Father had colon cancer at age 70."
+      "source_quote": "Father had colon cancer at age 70.",
+      "name": "colon cancer"
     },
     {
       "type": "procedure",

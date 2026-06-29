@@ -33,15 +33,15 @@
     },
     {
       "type": "family_history",
-      "condition": "thyroid cancer",
       "relation": "sister",
-      "source_quote": "Sister has thyroid cancer."
+      "source_quote": "Sister has thyroid cancer.",
+      "name": "thyroid cancer"
     },
     {
       "type": "family_history",
-      "condition": "osteoporosis",
       "relation": "mother",
-      "source_quote": "Mother has osteoporosis."
+      "source_quote": "Mother has osteoporosis.",
+      "name": "osteoporosis"
     },
     {
       "type": "condition",
