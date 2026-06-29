@@ -17,6 +17,7 @@ from processor.src.domain.evaluation import (
     expected_items_from_json,
     expected_item_match_key,
     find_extra_predicted_indexes,
+    find_invalid_trap_hits,
     find_missing_expected_indexes,
     invalid_traps_from_json,
     make_match_key,
@@ -863,6 +864,212 @@ class EvaluationModelTests(unittest.TestCase):
         with self.assertRaises(EvaluationError):
             find_extra_predicted_indexes(predicted_items, matches)
 
+    def test_find_invalid_trap_hits_with_forbidden_status_hits_matching_prediction(self) -> None:
+        traps = (self.invalid_trap(item_type="procedure", name="circumcision", forbidden_status="performed"),)
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.PROCEDURE,
+                name="circumcision",
+                status="performed",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+        self.assertEqual("invalid_trap_hit", hits[0].issue_type)
+        self.assertEqual(0, hits[0].trap_index)
+        self.assertEqual(0, hits[0].predicted_index)
+
+    def test_find_invalid_trap_hits_without_forbidden_status_hits_by_type_and_name(self) -> None:
+        traps = (self.invalid_trap(item_type="condition", name="chest pain", forbidden_status=None),)
+        predicted_items = (self.clinical_item(name="chest pain", status="active"),)
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+        self.assertEqual(0, hits[0].trap_index)
+        self.assertEqual(0, hits[0].predicted_index)
+
+    def test_find_invalid_trap_hits_with_forbidden_status_ignores_different_status(self) -> None:
+        traps = (self.invalid_trap(item_type="procedure", name="circumcision", forbidden_status="performed"),)
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.PROCEDURE,
+                name="circumcision",
+                status="not_performed",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual((), hits)
+
+    def test_find_invalid_trap_hits_normalizes_names(self) -> None:
+        traps = (self.invalid_trap(item_type="condition", name=" Chest Pain "),)
+        predicted_items = (self.clinical_item(name="chest pain"),)
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_normalizes_item_types(self) -> None:
+        traps = (self.invalid_trap(item_type="diagnosis", name="hypertension"),)
+        predicted_items = (self.clinical_item(item_type=ClinicalItemType.CONDITION, name="hypertension"),)
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_normalizes_statuses(self) -> None:
+        traps = (self.invalid_trap(item_type="procedure", name="circumcision", forbidden_status="not performed"),)
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.PROCEDURE,
+                name="circumcision",
+                status="not_performed",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_preserves_trap_then_prediction_order(self) -> None:
+        traps = (
+            self.invalid_trap(item_type="condition", name="chest pain"),
+            self.invalid_trap(item_type="medication", name="apixaban", forbidden_status="active"),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.MEDICATION,
+                name="apixaban",
+                status="active",
+            ),
+            self.clinical_item(name="chest pain", status="active"),
+            self.clinical_item(
+                item_type=ClinicalItemType.MEDICATION,
+                name="apixaban",
+                status="active",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(
+            (
+                ("invalid_trap_hit", 0, 1),
+                ("invalid_trap_hit", 1, 0),
+                ("invalid_trap_hit", 1, 2),
+            ),
+            tuple((hit.issue_type, hit.trap_index, hit.predicted_index) for hit in hits),
+        )
+
+    def test_find_invalid_trap_hits_detects_performed_circumcision_trap(self) -> None:
+        traps = (
+            self.invalid_trap(
+                item_type="procedure",
+                name="circumcision",
+                forbidden_status="performed",
+                reason="Explicitly not performed",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.PROCEDURE,
+                name="circumcision",
+                status="performed",
+                source_quote="Circumcision was not performed.",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_detects_active_chest_pain_trap(self) -> None:
+        traps = (
+            self.invalid_trap(
+                item_type="condition",
+                name="chest pain",
+                forbidden_status="active",
+                reason="Patient denies chest pain",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.CONDITION,
+                name="chest pain",
+                status="active",
+                source_quote="Patient denies chest pain.",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_detects_active_family_history_cancer_trap(self) -> None:
+        traps = (
+            self.invalid_trap(
+                item_type="condition",
+                name="breast cancer",
+                forbidden_status="active",
+                reason="Family history only",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.CONDITION,
+                name="breast cancer",
+                status="active",
+                source_quote="Mother had breast cancer.",
+                section_name="Family History",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_detects_active_stopped_medication_trap(self) -> None:
+        traps = (
+            self.invalid_trap(
+                item_type="medication",
+                name="apixaban",
+                forbidden_status="active",
+                reason="Medication was stopped",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.MEDICATION,
+                name="apixaban",
+                status="active",
+                source_quote="Apixaban was stopped.",
+            ),
+        )
+
+        hits = find_invalid_trap_hits(traps, predicted_items)
+
+        self.assertEqual(1, len(hits))
+
+    def test_find_invalid_trap_hits_rejects_invalid_trap_collection_or_entries(self) -> None:
+        predicted_items = [self.clinical_item()]
+
+        with self.assertRaises(EvaluationError):
+            find_invalid_trap_hits(None, predicted_items)
+        with self.assertRaises(EvaluationError):
+            find_invalid_trap_hits([object()], predicted_items)
+
+    def test_find_invalid_trap_hits_rejects_invalid_predicted_collection_or_entries(self) -> None:
+        traps = [self.invalid_trap()]
+
+        with self.assertRaises(EvaluationError):
+            find_invalid_trap_hits(traps, None)
+        with self.assertRaises(EvaluationError):
+            find_invalid_trap_hits(traps, [object()])
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -888,6 +1095,16 @@ class EvaluationModelTests(unittest.TestCase):
         }
         values.update(overrides)
         return ExpectedClinicalItem(**values)
+
+    def invalid_trap(self, **overrides) -> InvalidExtractionTrap:
+        values = {
+            "item_type": "condition",
+            "name": "hypertension",
+            "forbidden_status": "active",
+            "reason": "Known invalid extraction.",
+        }
+        values.update(overrides)
+        return InvalidExtractionTrap(**values)
 
     def clinical_item(self, **overrides) -> ExtractedClinicalItem:
         values = {

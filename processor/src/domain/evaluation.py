@@ -340,6 +340,39 @@ def find_extra_predicted_indexes(
     )
 
 
+def find_invalid_trap_hits(
+    invalid_traps: tuple[InvalidExtractionTrap, ...] | list[InvalidExtractionTrap],
+    predicted_items: tuple[ExtractedClinicalItem, ...] | list[ExtractedClinicalItem],
+) -> tuple[EvaluationIssue, ...]:
+    """Return deterministic issues for predictions that hit invalid extraction traps."""
+
+    traps_tuple = _validate_invalid_traps(invalid_traps)
+    predicted_items_tuple = _validate_predicted_items(predicted_items)
+
+    predicted_keys = tuple(clinical_item_match_key(predicted_item) for predicted_item in predicted_items_tuple)
+    hits = []
+
+    for trap_index, trap in enumerate(traps_tuple):
+        trap_key = make_match_key(
+            item_type=trap.item_type,
+            name=trap.name,
+            status=trap.forbidden_status,
+        )
+
+        for predicted_index, predicted_key in enumerate(predicted_keys):
+            if match_keys_compatible(trap_key, predicted_key):
+                hits.append(
+                    EvaluationIssue(
+                        issue_type="invalid_trap_hit",
+                        message=_invalid_trap_hit_message(trap, predicted_items_tuple[predicted_index]),
+                        trap_index=trap_index,
+                        predicted_index=predicted_index,
+                    )
+                )
+
+    return tuple(hits)
+
+
 def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:
     raw_values = expected_json.get(key, ())
     if not isinstance(raw_values, (list, tuple)):
@@ -387,12 +420,29 @@ def _validate_predicted_items(values: Iterable[object]) -> tuple[ExtractedClinic
     return items
 
 
+def _validate_invalid_traps(values: Iterable[object]) -> tuple[InvalidExtractionTrap, ...]:
+    traps = _normalize_tuple(values, "invalid_traps")
+    for index, trap in enumerate(traps):
+        if not isinstance(trap, InvalidExtractionTrap):
+            raise EvaluationError(f"invalid_traps[{index}] must be an InvalidExtractionTrap.")
+    return traps
+
+
 def _validate_matches(values: Iterable[object]) -> tuple[ItemMatch, ...]:
     matches = _normalize_tuple(values, "matches")
     for index, match in enumerate(matches):
         if not isinstance(match, ItemMatch):
             raise EvaluationError(f"matches[{index}] must be an ItemMatch.")
     return matches
+
+
+def _invalid_trap_hit_message(trap: InvalidExtractionTrap, predicted_item: ExtractedClinicalItem) -> str:
+    status_text = f" with forbidden status {trap.forbidden_status}" if trap.forbidden_status else ""
+    reason_text = f" Reason: {trap.reason}" if trap.reason else ""
+    return (
+        f"Predicted {predicted_item.item_type.value} '{predicted_item.name}' matched invalid "
+        f"trap {trap.item_type} '{trap.name}'{status_text}.{reason_text}"
+    )
 
 
 def _require_non_empty_string(value: str, field_name: str) -> None:
