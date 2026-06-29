@@ -33,3 +33,6 @@ data/sample_pdfs/*
 *.log
 logs/
 
+
+# Local planning scratch docs
+docs/implementation_master_plan.md
