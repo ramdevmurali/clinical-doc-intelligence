@@ -188,6 +188,39 @@ def invalid_traps_from_json(expected_json: dict) -> tuple[InvalidExtractionTrap,
     )
 
 
+def evaluate_predictions(
+    raw_text: str,
+    expected_json: dict,
+    predicted_items: Iterable[ExtractedClinicalItem],
+) -> EvaluationResult:
+    """Evaluate predicted clinical items against one document's expected labels."""
+
+    expected_items = expected_items_from_json(expected_json)
+    invalid_traps = invalid_traps_from_json(expected_json)
+    predicted_items_tuple = _validate_predicted_items(predicted_items)
+
+    matches = match_expected_items(expected_items, predicted_items_tuple)
+    missing_expected_indexes = find_missing_expected_indexes(expected_items, matches)
+    extra_predicted_indexes = find_extra_predicted_indexes(predicted_items_tuple, matches)
+    invalid_trap_hits = find_invalid_trap_hits(invalid_traps, predicted_items_tuple)
+    source_quote_failures = validate_predicted_source_quotes(raw_text, predicted_items_tuple)
+
+    return EvaluationResult(
+        expected_item_count=len(expected_items),
+        predicted_item_count=len(predicted_items_tuple),
+        matched_item_count=len(matches),
+        missing_item_count=len(missing_expected_indexes),
+        extra_item_count=len(extra_predicted_indexes),
+        invalid_trap_hit_count=len(invalid_trap_hits),
+        source_quote_failure_count=len(source_quote_failures),
+        matches=matches,
+        missing_expected_indexes=missing_expected_indexes,
+        extra_predicted_indexes=extra_predicted_indexes,
+        invalid_trap_hits=invalid_trap_hits,
+        source_quote_failures=source_quote_failures,
+    )
+
+
 def make_match_key(
     item_type: str,
     name: str,

@@ -14,6 +14,7 @@ from processor.src.domain.evaluation import (
     InvalidExtractionTrap,
     ItemMatch,
     clinical_item_match_key,
+    evaluate_predictions,
     expected_items_from_json,
     expected_item_match_key,
     find_extra_predicted_indexes,
@@ -1158,6 +1159,178 @@ class EvaluationModelTests(unittest.TestCase):
 
         self.assertEqual(original_items, predicted_items)
 
+    def test_evaluate_predictions_perfect_prediction_returns_complete_zero_failure_result(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        expected_json = self.expected_json(
+            items=[
+                {
+                    "type": "condition",
+                    "name": "hypertension",
+                    "status": "active",
+                    "source_quote": "Hypertension is active.",
+                }
+            ]
+        )
+        predicted_items = (self.item_for_quote(raw_text, "Hypertension is active.", name="hypertension"),)
+
+        result = evaluate_predictions(raw_text, expected_json, predicted_items)
+
+        self.assertEqual(1, result.expected_item_count)
+        self.assertEqual(1, result.predicted_item_count)
+        self.assertEqual(1, result.matched_item_count)
+        self.assertEqual(0, result.missing_item_count)
+        self.assertEqual(0, result.extra_item_count)
+        self.assertEqual(0, result.invalid_trap_hit_count)
+        self.assertEqual(0, result.source_quote_failure_count)
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), result.matches)
+
+    def test_evaluate_predictions_missing_prediction_increments_missing_count(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        expected_json = self.expected_json(
+            items=[{"type": "condition", "name": "hypertension", "status": "active"}]
+        )
+
+        result = evaluate_predictions(raw_text, expected_json, ())
+
+        self.assertEqual(1, result.expected_item_count)
+        self.assertEqual(0, result.predicted_item_count)
+        self.assertEqual(0, result.matched_item_count)
+        self.assertEqual(1, result.missing_item_count)
+        self.assertEqual((0,), result.missing_expected_indexes)
+
+    def test_evaluate_predictions_extra_prediction_increments_extra_count(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        expected_json = self.expected_json(items=[])
+        predicted_items = (self.item_for_quote(raw_text, "Hypertension is active.", name="hypertension"),)
+
+        result = evaluate_predictions(raw_text, expected_json, predicted_items)
+
+        self.assertEqual(0, result.expected_item_count)
+        self.assertEqual(1, result.predicted_item_count)
+        self.assertEqual(0, result.matched_item_count)
+        self.assertEqual(1, result.extra_item_count)
+        self.assertEqual((0,), result.extra_predicted_indexes)
+
+    def test_evaluate_predictions_invalid_trap_prediction_increments_trap_hit_count(self) -> None:
+        raw_text = "Procedure: Circumcision was not performed."
+        expected_json = self.expected_json(
+            invalid_extractions=[
+                {
+                    "type": "procedure",
+                    "name": "circumcision",
+                    "forbidden_status": "performed",
+                    "reason": "Explicitly not performed",
+                }
+            ]
+        )
+        predicted_items = (
+            self.item_for_quote(
+                raw_text,
+                "Circumcision was not performed.",
+                item_type=ClinicalItemType.PROCEDURE,
+                name="circumcision",
+                status="performed",
+            ),
+        )
+
+        result = evaluate_predictions(raw_text, expected_json, predicted_items)
+
+        self.assertEqual(1, result.invalid_trap_hit_count)
+        self.assertEqual("invalid_trap_hit", result.invalid_trap_hits[0].issue_type)
+
+    def test_evaluate_predictions_bad_source_quote_increments_source_failure_count(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        expected_json = self.expected_json()
+        predicted_items = (
+            self.clinical_item(
+                name="hypertension",
+                source_quote="Hypertension is active.",
+                source_start_char=0,
+                source_end_char=len("Hypertension is active."),
+            ),
+        )
+
+        result = evaluate_predictions(raw_text, expected_json, predicted_items)
+
+        self.assertEqual(1, result.source_quote_failure_count)
+        self.assertEqual("source_quote_failure", result.source_quote_failures[0].issue_type)
+
+    def test_evaluate_predictions_mixed_case_is_deterministic(self) -> None:
+        raw_text = (
+            "Assessment: Hypertension is active.\n"
+            "Plan: Diabetes follow-up needed.\n"
+            "Medication: Apixaban was stopped."
+        )
+        expected_json = self.expected_json(
+            items=[
+                {
+                    "type": "condition",
+                    "name": "hypertension",
+                    "status": "active",
+                    "source_quote": "Hypertension is active.",
+                },
+                {
+                    "type": "condition",
+                    "name": "asthma",
+                    "status": "active",
+                },
+            ],
+            invalid_extractions=[
+                {
+                    "type": "medication",
+                    "name": "apixaban",
+                    "forbidden_status": "active",
+                    "reason": "Medication was stopped",
+                }
+            ],
+        )
+        predicted_items = (
+            self.item_for_quote(raw_text, "Hypertension is active.", name="hypertension"),
+            self.item_for_quote(raw_text, "Diabetes follow-up needed.", name="diabetes"),
+            self.item_for_quote(
+                raw_text,
+                "Apixaban was stopped.",
+                item_type=ClinicalItemType.MEDICATION,
+                name="apixaban",
+                status="active",
+            ),
+            self.clinical_item(
+                name="pneumonia",
+                source_quote="Diabetes follow-up needed.",
+                source_start_char=0,
+                source_end_char=len("Diabetes follow-up needed."),
+            ),
+        )
+
+        result = evaluate_predictions(raw_text, expected_json, predicted_items)
+
+        self.assertEqual(2, result.expected_item_count)
+        self.assertEqual(4, result.predicted_item_count)
+        self.assertEqual(1, result.matched_item_count)
+        self.assertEqual(1, result.missing_item_count)
+        self.assertEqual(3, result.extra_item_count)
+        self.assertEqual(1, result.invalid_trap_hit_count)
+        self.assertEqual(1, result.source_quote_failure_count)
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), result.matches)
+        self.assertEqual((1,), result.missing_expected_indexes)
+        self.assertEqual((1, 2, 3), result.extra_predicted_indexes)
+        self.assertEqual((0, 2), (result.invalid_trap_hits[0].trap_index, result.invalid_trap_hits[0].predicted_index))
+        self.assertEqual(3, result.source_quote_failures[0].predicted_index)
+
+    def test_evaluate_predictions_rejects_invalid_expected_json(self) -> None:
+        with self.assertRaises(EvaluationError):
+            evaluate_predictions("Assessment text.", [], ())
+
+    def test_evaluate_predictions_rejects_empty_raw_text(self) -> None:
+        with self.assertRaises(EvaluationError):
+            evaluate_predictions("", self.expected_json(), ())
+
+    def test_evaluate_predictions_rejects_invalid_predicted_collection_or_entry(self) -> None:
+        with self.assertRaises(EvaluationError):
+            evaluate_predictions("Assessment text.", self.expected_json(), None)
+        with self.assertRaises(EvaluationError):
+            evaluate_predictions("Assessment text.", self.expected_json(), [object()])
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -1183,6 +1356,14 @@ class EvaluationModelTests(unittest.TestCase):
         }
         values.update(overrides)
         return ExpectedClinicalItem(**values)
+
+    def expected_json(self, **overrides) -> dict:
+        values = {
+            "items": [],
+            "invalid_extractions": [],
+        }
+        values.update(overrides)
+        return values
 
     def invalid_trap(self, **overrides) -> InvalidExtractionTrap:
         values = {
