@@ -5,6 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable
 
+from processor.src.domain.extraction_schema import ExtractedClinicalItem
+from processor.src.domain.normalization import (
+    NormalizationError,
+    normalize_item_type,
+    normalize_name,
+    normalize_status,
+)
+
 
 class EvaluationError(ValueError):
     """Raised when evaluation inputs violate domain contracts."""
@@ -40,6 +48,22 @@ class InvalidExtractionTrap:
         _require_non_empty_string(self.name, "Invalid extraction trap name")
         _validate_optional_string(self.forbidden_status, "Invalid extraction trap forbidden_status")
         _validate_optional_string(self.reason, "Invalid extraction trap reason")
+
+
+@dataclass(frozen=True)
+class EvaluationMatchKey:
+    """Normalized conservative comparison key for evaluation matching."""
+
+    item_type: str
+    name: str
+    status: str | None = None
+    source_quote: str | None = None
+
+    def __post_init__(self) -> None:
+        _require_non_empty_string(self.item_type, "Evaluation match key item_type")
+        _require_non_empty_string(self.name, "Evaluation match key name")
+        _validate_optional_string(self.status, "Evaluation match key status")
+        _validate_optional_string(self.source_quote, "Evaluation match key source_quote")
 
 
 @dataclass(frozen=True)
@@ -163,6 +187,74 @@ def invalid_traps_from_json(expected_json: dict) -> tuple[InvalidExtractionTrap,
     )
 
 
+def make_match_key(
+    item_type: str,
+    name: str,
+    status: str | None = None,
+    source_quote: str | None = None,
+) -> EvaluationMatchKey:
+    """Build a normalized deterministic evaluation match key."""
+
+    try:
+        normalized_item_type = normalize_item_type(item_type).value
+        normalized_name = normalize_name(name)
+        normalized_status = normalize_status(status)
+    except NormalizationError as exc:
+        raise EvaluationError(f"Could not normalize evaluation match key: {exc}") from exc
+
+    return EvaluationMatchKey(
+        item_type=normalized_item_type,
+        name=normalized_name,
+        status=normalized_status,
+        source_quote=source_quote,
+    )
+
+
+def expected_item_match_key(item: ExpectedClinicalItem) -> EvaluationMatchKey:
+    """Build a match key from a golden expected item."""
+
+    if not isinstance(item, ExpectedClinicalItem):
+        raise EvaluationError("expected_item_match_key requires ExpectedClinicalItem.")
+
+    return make_match_key(
+        item_type=item.item_type,
+        name=item.name,
+        status=item.status,
+        source_quote=item.source_quote,
+    )
+
+
+def clinical_item_match_key(item: ExtractedClinicalItem) -> EvaluationMatchKey:
+    """Build a match key from a predicted extracted clinical item."""
+
+    if not isinstance(item, ExtractedClinicalItem):
+        raise EvaluationError("clinical_item_match_key requires ExtractedClinicalItem.")
+
+    return make_match_key(
+        item_type=item.item_type.value,
+        name=item.name,
+        status=item.status,
+        source_quote=item.source_quote,
+    )
+
+
+def match_keys_compatible(expected_key: EvaluationMatchKey, predicted_key: EvaluationMatchKey) -> bool:
+    """Return whether a predicted key satisfies an expected key contract."""
+
+    _require_match_key(expected_key, "expected_key")
+    _require_match_key(predicted_key, "predicted_key")
+
+    if expected_key.item_type != predicted_key.item_type:
+        return False
+    if expected_key.name != predicted_key.name:
+        return False
+    if expected_key.status is not None and expected_key.status != predicted_key.status:
+        return False
+    if expected_key.source_quote is not None and expected_key.source_quote != predicted_key.source_quote:
+        return False
+    return True
+
+
 def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:
     raw_values = expected_json.get(key, ())
     if not isinstance(raw_values, (list, tuple)):
@@ -187,6 +279,11 @@ def _required_field(raw_item: dict, field_name: str, context: str) -> str:
 def _require_mapping(value: object, field_name: str) -> None:
     if not isinstance(value, dict):
         raise EvaluationError(f"{field_name} must be a dictionary.")
+
+
+def _require_match_key(value: object, field_name: str) -> None:
+    if not isinstance(value, EvaluationMatchKey):
+        raise EvaluationError(f"{field_name} must be an EvaluationMatchKey.")
 
 
 def _require_non_empty_string(value: str, field_name: str) -> None:

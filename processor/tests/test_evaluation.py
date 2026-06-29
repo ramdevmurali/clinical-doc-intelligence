@@ -4,15 +4,21 @@ from pathlib import Path
 import unittest
 from dataclasses import FrozenInstanceError
 
+from processor.src.domain.extraction_schema import ClinicalItemType, ExtractedClinicalItem
 from processor.src.domain.evaluation import (
     EvaluationError,
     EvaluationIssue,
+    EvaluationMatchKey,
     EvaluationResult,
     ExpectedClinicalItem,
     InvalidExtractionTrap,
     ItemMatch,
+    clinical_item_match_key,
     expected_items_from_json,
+    expected_item_match_key,
     invalid_traps_from_json,
+    make_match_key,
+    match_keys_compatible,
 )
 
 
@@ -433,6 +439,136 @@ class EvaluationModelTests(unittest.TestCase):
                     self.assertTrue(trap.item_type.strip())
                     self.assertTrue(trap.name.strip())
 
+    def test_make_match_key_normalizes_name(self) -> None:
+        key = make_match_key("condition", " Chest Pain ")
+
+        self.assertEqual(EvaluationMatchKey(item_type="condition", name="chest pain"), key)
+
+    def test_make_match_key_normalizes_item_type_alias(self) -> None:
+        key = make_match_key("diagnosis", "Hypertension")
+
+        self.assertEqual("condition", key.item_type)
+        self.assertEqual("hypertension", key.name)
+
+    def test_make_match_key_normalizes_status_alias(self) -> None:
+        key = make_match_key("procedure", "Circumcision", "not performed")
+
+        self.assertEqual("procedure", key.item_type)
+        self.assertEqual("circumcision", key.name)
+        self.assertEqual("not_performed", key.status)
+
+    def test_make_match_key_preserves_source_quote_exactly(self) -> None:
+        source_quote = " Patient Denies Chest Pain. "
+
+        key = make_match_key("condition", "chest pain", source_quote=source_quote)
+
+        self.assertEqual(source_quote, key.source_quote)
+
+    def test_make_match_key_rejects_unknown_item_type_status_and_empty_name(self) -> None:
+        with self.assertRaises(EvaluationError):
+            make_match_key("unknown_type", "hypertension")
+        with self.assertRaises(EvaluationError):
+            make_match_key("condition", "hypertension", "unknown_status")
+        with self.assertRaises(EvaluationError):
+            make_match_key("condition", "")
+
+    def test_expected_item_match_key_builds_from_expected_item(self) -> None:
+        item = ExpectedClinicalItem(
+            item_type="condition",
+            name=" Chest Pain ",
+            source_quote=" Patient denies chest pain. ",
+        )
+
+        key = expected_item_match_key(item)
+
+        self.assertEqual("condition", key.item_type)
+        self.assertEqual("chest pain", key.name)
+        self.assertIsNone(key.status)
+        self.assertEqual(" Patient denies chest pain. ", key.source_quote)
+
+    def test_expected_item_match_key_rejects_wrong_shape(self) -> None:
+        with self.assertRaises(EvaluationError):
+            expected_item_match_key(object())
+
+    def test_clinical_item_match_key_builds_from_extracted_item(self) -> None:
+        item = self.clinical_item(
+            item_type=ClinicalItemType.PROCEDURE,
+            name=" Circumcision ",
+            status="not performed",
+            source_quote="Circumcision was not performed.",
+        )
+
+        key = clinical_item_match_key(item)
+
+        self.assertEqual("procedure", key.item_type)
+        self.assertEqual("circumcision", key.name)
+        self.assertEqual("not_performed", key.status)
+        self.assertEqual("Circumcision was not performed.", key.source_quote)
+
+    def test_clinical_item_match_key_rejects_wrong_shape(self) -> None:
+        with self.assertRaises(EvaluationError):
+            clinical_item_match_key(object())
+
+    def test_match_keys_compatible_with_same_normalized_values(self) -> None:
+        expected_key = make_match_key(
+            "condition",
+            " Chest Pain ",
+            "active",
+            "Patient reports chest pain.",
+        )
+        predicted_key = make_match_key(
+            "diagnosis",
+            "chest pain",
+            "active",
+            "Patient reports chest pain.",
+        )
+
+        self.assertTrue(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_compatible_with_status_alias(self) -> None:
+        expected_key = make_match_key("procedure", "circumcision", "not performed")
+        predicted_key = make_match_key("procedure", "circumcision", "not_performed")
+
+        self.assertTrue(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_incompatible_when_expected_source_quote_differs(self) -> None:
+        expected_key = make_match_key("condition", "chest pain", source_quote="Patient denies chest pain.")
+        predicted_key = make_match_key("condition", "chest pain", source_quote="Patient reports chest pain.")
+
+        self.assertFalse(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_ignore_predicted_source_quote_when_expected_source_quote_absent(self) -> None:
+        expected_key = make_match_key("condition", "chest pain")
+        predicted_key = make_match_key("condition", "chest pain", source_quote="Patient reports chest pain.")
+
+        self.assertTrue(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_incompatible_when_expected_status_differs(self) -> None:
+        expected_key = make_match_key("medication", "warfarin", "discontinued")
+        predicted_key = make_match_key("medication", "warfarin", "active")
+
+        self.assertFalse(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_ignore_predicted_status_when_expected_status_absent(self) -> None:
+        expected_key = make_match_key("medication", "warfarin")
+        predicted_key = make_match_key("medication", "warfarin", "active")
+
+        self.assertTrue(match_keys_compatible(expected_key, predicted_key))
+
+    def test_match_keys_incompatible_for_different_item_type_or_name(self) -> None:
+        expected_key = make_match_key("condition", "chest pain")
+
+        self.assertFalse(match_keys_compatible(expected_key, make_match_key("procedure", "chest pain")))
+        self.assertFalse(match_keys_compatible(expected_key, make_match_key("condition", "fever")))
+
+    def test_match_keys_compatible_rejects_wrong_shapes(self) -> None:
+        key = make_match_key("condition", "chest pain")
+
+        with self.assertRaises(EvaluationError):
+            match_keys_compatible(object(), key)
+        with self.assertRaises(EvaluationError):
+            match_keys_compatible(key, object())
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -448,6 +584,21 @@ class EvaluationModelTests(unittest.TestCase):
 
     def repo_root(self) -> Path:
         return Path(__file__).resolve().parents[2]
+
+    def clinical_item(self, **overrides) -> ExtractedClinicalItem:
+        values = {
+            "item_type": ClinicalItemType.CONDITION,
+            "name": "hypertension",
+            "status": "active",
+            "confidence": 0.95,
+            "source_quote": "Hypertension.",
+            "source_start_char": 0,
+            "source_end_char": len("Hypertension."),
+            "section_id": "note_001:section:001",
+            "section_name": "Assessment",
+        }
+        values.update(overrides)
+        return ExtractedClinicalItem(**values)
 
 
 if __name__ == "__main__":
