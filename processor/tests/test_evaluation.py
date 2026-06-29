@@ -16,6 +16,8 @@ from processor.src.domain.evaluation import (
     clinical_item_match_key,
     expected_items_from_json,
     expected_item_match_key,
+    find_extra_predicted_indexes,
+    find_missing_expected_indexes,
     invalid_traps_from_json,
     make_match_key,
     match_expected_items,
@@ -720,6 +722,147 @@ class EvaluationModelTests(unittest.TestCase):
         with self.assertRaises(EvaluationError):
             match_expected_items([expected_item], [object()])
 
+    def test_find_missing_expected_indexes_returns_empty_for_perfect_match(self) -> None:
+        expected_items = (
+            self.expected_item(name="hypertension"),
+            self.expected_item(name="diabetes"),
+        )
+        matches = (
+            ItemMatch(expected_index=0, predicted_index=0),
+            ItemMatch(expected_index=1, predicted_index=1),
+        )
+
+        missing_indexes = find_missing_expected_indexes(expected_items, matches)
+
+        self.assertEqual((), missing_indexes)
+
+    def test_find_missing_expected_indexes_returns_single_missing_index(self) -> None:
+        expected_items = (
+            self.expected_item(name="hypertension"),
+            self.expected_item(name="diabetes"),
+            self.expected_item(name="asthma"),
+        )
+        matches = (
+            ItemMatch(expected_index=0, predicted_index=0),
+            ItemMatch(expected_index=2, predicted_index=1),
+        )
+
+        missing_indexes = find_missing_expected_indexes(expected_items, matches)
+
+        self.assertEqual((1,), missing_indexes)
+
+    def test_find_missing_expected_indexes_preserves_multiple_missing_indexes_order(self) -> None:
+        expected_items = (
+            self.expected_item(name="hypertension"),
+            self.expected_item(name="diabetes"),
+            self.expected_item(name="asthma"),
+            self.expected_item(name="pneumonia"),
+        )
+        matches = (ItemMatch(expected_index=2, predicted_index=0),)
+
+        missing_indexes = find_missing_expected_indexes(expected_items, matches)
+
+        self.assertEqual((0, 1, 3), missing_indexes)
+
+    def test_find_extra_predicted_indexes_returns_empty_for_perfect_match(self) -> None:
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="diabetes"),
+        )
+        matches = (
+            ItemMatch(expected_index=0, predicted_index=0),
+            ItemMatch(expected_index=1, predicted_index=1),
+        )
+
+        extra_indexes = find_extra_predicted_indexes(predicted_items, matches)
+
+        self.assertEqual((), extra_indexes)
+
+    def test_find_extra_predicted_indexes_returns_single_extra_index(self) -> None:
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="diabetes"),
+            self.clinical_item(name="asthma"),
+        )
+        matches = (
+            ItemMatch(expected_index=0, predicted_index=0),
+            ItemMatch(expected_index=1, predicted_index=2),
+        )
+
+        extra_indexes = find_extra_predicted_indexes(predicted_items, matches)
+
+        self.assertEqual((1,), extra_indexes)
+
+    def test_find_extra_predicted_indexes_preserves_multiple_extra_indexes_order(self) -> None:
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="diabetes"),
+            self.clinical_item(name="asthma"),
+            self.clinical_item(name="pneumonia"),
+        )
+        matches = (ItemMatch(expected_index=0, predicted_index=2),)
+
+        extra_indexes = find_extra_predicted_indexes(predicted_items, matches)
+
+        self.assertEqual((0, 1, 3), extra_indexes)
+
+    def test_missing_and_extra_index_helpers_accept_list_inputs(self) -> None:
+        expected_items = [
+            self.expected_item(name="hypertension"),
+            self.expected_item(name="diabetes"),
+        ]
+        predicted_items = [
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="diabetes"),
+        ]
+        matches = [ItemMatch(expected_index=0, predicted_index=0)]
+
+        self.assertEqual((1,), find_missing_expected_indexes(expected_items, matches))
+        self.assertEqual((1,), find_extra_predicted_indexes(predicted_items, matches))
+
+    def test_find_missing_expected_indexes_rejects_invalid_expected_collection_or_entries(self) -> None:
+        match = ItemMatch(expected_index=0, predicted_index=0)
+
+        with self.assertRaises(EvaluationError):
+            find_missing_expected_indexes(None, [match])
+        with self.assertRaises(EvaluationError):
+            find_missing_expected_indexes([object()], [match])
+
+    def test_find_extra_predicted_indexes_rejects_invalid_predicted_collection_or_entries(self) -> None:
+        match = ItemMatch(expected_index=0, predicted_index=0)
+
+        with self.assertRaises(EvaluationError):
+            find_extra_predicted_indexes(None, [match])
+        with self.assertRaises(EvaluationError):
+            find_extra_predicted_indexes([object()], [match])
+
+    def test_missing_and_extra_index_helpers_reject_invalid_matches_collection_or_entries(self) -> None:
+        expected_items = [self.expected_item()]
+        predicted_items = [self.clinical_item()]
+
+        with self.assertRaises(EvaluationError):
+            find_missing_expected_indexes(expected_items, None)
+        with self.assertRaises(EvaluationError):
+            find_extra_predicted_indexes(predicted_items, None)
+        with self.assertRaises(EvaluationError):
+            find_missing_expected_indexes(expected_items, [object()])
+        with self.assertRaises(EvaluationError):
+            find_extra_predicted_indexes(predicted_items, [object()])
+
+    def test_find_missing_expected_indexes_rejects_out_of_bounds_expected_match_index(self) -> None:
+        expected_items = (self.expected_item(name="hypertension"),)
+        matches = (ItemMatch(expected_index=1, predicted_index=0),)
+
+        with self.assertRaises(EvaluationError):
+            find_missing_expected_indexes(expected_items, matches)
+
+    def test_find_extra_predicted_indexes_rejects_out_of_bounds_predicted_match_index(self) -> None:
+        predicted_items = (self.clinical_item(name="hypertension"),)
+        matches = (ItemMatch(expected_index=0, predicted_index=1),)
+
+        with self.assertRaises(EvaluationError):
+            find_extra_predicted_indexes(predicted_items, matches)
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -735,6 +878,16 @@ class EvaluationModelTests(unittest.TestCase):
 
     def repo_root(self) -> Path:
         return Path(__file__).resolve().parents[2]
+
+    def expected_item(self, **overrides) -> ExpectedClinicalItem:
+        values = {
+            "item_type": "condition",
+            "name": "hypertension",
+            "status": "active",
+            "source_quote": "Hypertension.",
+        }
+        values.update(overrides)
+        return ExpectedClinicalItem(**values)
 
     def clinical_item(self, **overrides) -> ExtractedClinicalItem:
         values = {

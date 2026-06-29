@@ -296,6 +296,50 @@ def match_expected_items(
     return tuple(matches)
 
 
+def find_missing_expected_indexes(
+    expected_items: tuple[ExpectedClinicalItem, ...] | list[ExpectedClinicalItem],
+    matches: tuple[ItemMatch, ...] | list[ItemMatch],
+) -> tuple[int, ...]:
+    """Return expected item indexes that do not appear in matches."""
+
+    expected_items_tuple = _validate_expected_items(expected_items)
+    matches_tuple = _validate_matches(matches)
+
+    matched_expected_indexes = set()
+    for match in matches_tuple:
+        if match.expected_index >= len(expected_items_tuple):
+            raise EvaluationError("ItemMatch expected_index is outside expected_items bounds.")
+        matched_expected_indexes.add(match.expected_index)
+
+    return tuple(
+        expected_index
+        for expected_index in range(len(expected_items_tuple))
+        if expected_index not in matched_expected_indexes
+    )
+
+
+def find_extra_predicted_indexes(
+    predicted_items: tuple[ExtractedClinicalItem, ...] | list[ExtractedClinicalItem],
+    matches: tuple[ItemMatch, ...] | list[ItemMatch],
+) -> tuple[int, ...]:
+    """Return predicted item indexes that do not appear in matches."""
+
+    predicted_items_tuple = _validate_predicted_items(predicted_items)
+    matches_tuple = _validate_matches(matches)
+
+    matched_predicted_indexes = set()
+    for match in matches_tuple:
+        if match.predicted_index >= len(predicted_items_tuple):
+            raise EvaluationError("ItemMatch predicted_index is outside predicted_items bounds.")
+        matched_predicted_indexes.add(match.predicted_index)
+
+    return tuple(
+        predicted_index
+        for predicted_index in range(len(predicted_items_tuple))
+        if predicted_index not in matched_predicted_indexes
+    )
+
+
 def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:
     raw_values = expected_json.get(key, ())
     if not isinstance(raw_values, (list, tuple)):
@@ -325,6 +369,30 @@ def _require_mapping(value: object, field_name: str) -> None:
 def _require_match_key(value: object, field_name: str) -> None:
     if not isinstance(value, EvaluationMatchKey):
         raise EvaluationError(f"{field_name} must be an EvaluationMatchKey.")
+
+
+def _validate_expected_items(values: Iterable[object]) -> tuple[ExpectedClinicalItem, ...]:
+    items = _normalize_tuple(values, "expected_items")
+    for index, item in enumerate(items):
+        if not isinstance(item, ExpectedClinicalItem):
+            raise EvaluationError(f"expected_items[{index}] must be an ExpectedClinicalItem.")
+    return items
+
+
+def _validate_predicted_items(values: Iterable[object]) -> tuple[ExtractedClinicalItem, ...]:
+    items = _normalize_tuple(values, "predicted_items")
+    for index, item in enumerate(items):
+        if not isinstance(item, ExtractedClinicalItem):
+            raise EvaluationError(f"predicted_items[{index}] must be an ExtractedClinicalItem.")
+    return items
+
+
+def _validate_matches(values: Iterable[object]) -> tuple[ItemMatch, ...]:
+    matches = _normalize_tuple(values, "matches")
+    for index, match in enumerate(matches):
+        if not isinstance(match, ItemMatch):
+            raise EvaluationError(f"matches[{index}] must be an ItemMatch.")
+    return matches
 
 
 def _require_non_empty_string(value: str, field_name: str) -> None:
