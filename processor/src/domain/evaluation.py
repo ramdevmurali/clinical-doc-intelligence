@@ -255,6 +255,47 @@ def match_keys_compatible(expected_key: EvaluationMatchKey, predicted_key: Evalu
     return True
 
 
+def match_expected_items(
+    expected_items: tuple[ExpectedClinicalItem, ...] | list[ExpectedClinicalItem],
+    predicted_items: tuple[ExtractedClinicalItem, ...] | list[ExtractedClinicalItem],
+) -> tuple[ItemMatch, ...]:
+    """Deterministically match expected items to predicted clinical items."""
+
+    expected_items_tuple = _normalize_tuple(expected_items, "expected_items")
+    predicted_items_tuple = _normalize_tuple(predicted_items, "predicted_items")
+
+    for index, expected_item in enumerate(expected_items_tuple):
+        if not isinstance(expected_item, ExpectedClinicalItem):
+            raise EvaluationError(f"expected_items[{index}] must be an ExpectedClinicalItem.")
+
+    predicted_keys = []
+    for index, predicted_item in enumerate(predicted_items_tuple):
+        if not isinstance(predicted_item, ExtractedClinicalItem):
+            raise EvaluationError(f"predicted_items[{index}] must be an ExtractedClinicalItem.")
+        predicted_keys.append(clinical_item_match_key(predicted_item))
+
+    matches = []
+    matched_predicted_indexes: set[int] = set()
+
+    for expected_index, expected_item in enumerate(expected_items_tuple):
+        expected_key = expected_item_match_key(expected_item)
+
+        for predicted_index, predicted_key in enumerate(predicted_keys):
+            if predicted_index in matched_predicted_indexes:
+                continue
+            if match_keys_compatible(expected_key, predicted_key):
+                matches.append(
+                    ItemMatch(
+                        expected_index=expected_index,
+                        predicted_index=predicted_index,
+                    )
+                )
+                matched_predicted_indexes.add(predicted_index)
+                break
+
+    return tuple(matches)
+
+
 def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:
     raw_values = expected_json.get(key, ())
     if not isinstance(raw_values, (list, tuple)):

@@ -18,6 +18,7 @@ from processor.src.domain.evaluation import (
     expected_item_match_key,
     invalid_traps_from_json,
     make_match_key,
+    match_expected_items,
     match_keys_compatible,
 )
 
@@ -568,6 +569,156 @@ class EvaluationModelTests(unittest.TestCase):
             match_keys_compatible(object(), key)
         with self.assertRaises(EvaluationError):
             match_keys_compatible(key, object())
+
+    def test_match_expected_items_matches_one_expected_to_one_prediction(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension", status="active"),)
+        predicted_items = (self.clinical_item(name="hypertension", status="active"),)
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_returns_empty_when_expected_item_missing(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension"),)
+        predicted_items = (self.clinical_item(name="diabetes"),)
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((), matches)
+
+    def test_match_expected_items_leaves_extra_prediction_unmatched(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension"),)
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="diabetes"),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_duplicate_predictions_match_once_to_first_prediction(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension"),)
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="hypertension"),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_duplicate_expected_items_require_distinct_predictions(self) -> None:
+        expected_items = (
+            ExpectedClinicalItem(item_type="condition", name="hypertension"),
+            ExpectedClinicalItem(item_type="condition", name="hypertension"),
+        )
+        predicted_items = (
+            self.clinical_item(name="hypertension"),
+            self.clinical_item(name="hypertension"),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual(
+            (
+                ItemMatch(expected_index=0, predicted_index=0),
+                ItemMatch(expected_index=1, predicted_index=1),
+            ),
+            matches,
+        )
+
+    def test_match_expected_items_duplicate_expected_items_with_one_prediction_match_once(self) -> None:
+        expected_items = (
+            ExpectedClinicalItem(item_type="condition", name="hypertension"),
+            ExpectedClinicalItem(item_type="condition", name="hypertension"),
+        )
+        predicted_items = (self.clinical_item(name="hypertension"),)
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_status_mismatch_prevents_match_when_expected_status_exists(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension", status="active"),)
+        predicted_items = (self.clinical_item(name="hypertension", status="resolved"),)
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((), matches)
+
+    def test_match_expected_items_predicted_status_can_differ_when_expected_status_absent(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension"),)
+        predicted_items = (self.clinical_item(name="hypertension", status="active"),)
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_source_quote_mismatch_prevents_match_when_expected_quote_exists(self) -> None:
+        expected_items = (
+            ExpectedClinicalItem(
+                item_type="condition",
+                name="hypertension",
+                source_quote="Past medical history includes hypertension.",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                name="hypertension",
+                source_quote="Assessment includes hypertension.",
+            ),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((), matches)
+
+    def test_match_expected_items_predicted_source_quote_can_differ_when_expected_quote_absent(self) -> None:
+        expected_items = (ExpectedClinicalItem(item_type="condition", name="hypertension"),)
+        predicted_items = (
+            self.clinical_item(
+                name="hypertension",
+                source_quote="Assessment includes hypertension.",
+            ),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_uses_normalization_for_type_name_and_status(self) -> None:
+        expected_items = (
+            ExpectedClinicalItem(
+                item_type="diagnosis",
+                name="  Circumcision ",
+                status="not performed",
+            ),
+        )
+        predicted_items = (
+            self.clinical_item(
+                item_type=ClinicalItemType.CONDITION,
+                name="circumcision",
+                status="not_performed",
+            ),
+        )
+
+        matches = match_expected_items(expected_items, predicted_items)
+
+        self.assertEqual((ItemMatch(expected_index=0, predicted_index=0),), matches)
+
+    def test_match_expected_items_rejects_invalid_collections_and_entries(self) -> None:
+        expected_item = ExpectedClinicalItem(item_type="condition", name="hypertension")
+        predicted_item = self.clinical_item(name="hypertension")
+
+        with self.assertRaises(EvaluationError):
+            match_expected_items(None, [predicted_item])
+        with self.assertRaises(EvaluationError):
+            match_expected_items([expected_item], None)
+        with self.assertRaises(EvaluationError):
+            match_expected_items([object()], [predicted_item])
+        with self.assertRaises(EvaluationError):
+            match_expected_items([expected_item], [object()])
 
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
