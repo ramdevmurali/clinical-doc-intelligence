@@ -12,6 +12,7 @@ from processor.src.domain.normalization import (
     normalize_name,
     normalize_status,
 )
+from processor.src.domain.source_spans import SourceSpanError, validate_source_span
 
 
 class EvaluationError(ValueError):
@@ -371,6 +372,41 @@ def find_invalid_trap_hits(
                 )
 
     return tuple(hits)
+
+
+def validate_predicted_source_quotes(
+    raw_text: str,
+    predicted_items: tuple[ExtractedClinicalItem, ...] | list[ExtractedClinicalItem],
+) -> tuple[EvaluationIssue, ...]:
+    """Return source grounding failures for predicted clinical items."""
+
+    if not isinstance(raw_text, str) or not raw_text.strip():
+        raise EvaluationError("raw_text is required for source quote validation.")
+
+    predicted_items_tuple = _validate_predicted_items(predicted_items)
+    failures = []
+
+    for predicted_index, predicted_item in enumerate(predicted_items_tuple):
+        try:
+            validate_source_span(
+                raw_text=raw_text,
+                source_quote=predicted_item.source_quote,
+                start_char=predicted_item.source_start_char,
+                end_char=predicted_item.source_end_char,
+            )
+        except SourceSpanError as exc:
+            failures.append(
+                EvaluationIssue(
+                    issue_type="source_quote_failure",
+                    message=(
+                        "Predicted item source quote grounding failed "
+                        f"at predicted index {predicted_index}: {exc}"
+                    ),
+                    predicted_index=predicted_index,
+                )
+            )
+
+    return tuple(failures)
 
 
 def _optional_collection(expected_json: dict, key: str) -> tuple[dict, ...]:

@@ -23,6 +23,7 @@ from processor.src.domain.evaluation import (
     make_match_key,
     match_expected_items,
     match_keys_compatible,
+    validate_predicted_source_quotes,
 )
 
 
@@ -1070,6 +1071,93 @@ class EvaluationModelTests(unittest.TestCase):
         with self.assertRaises(EvaluationError):
             find_invalid_trap_hits(traps, [object()])
 
+    def test_validate_predicted_source_quotes_returns_empty_for_valid_quote_and_offsets(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        predicted_items = (self.item_for_quote(raw_text, "Hypertension is active."),)
+
+        failures = validate_predicted_source_quotes(raw_text, predicted_items)
+
+        self.assertEqual((), failures)
+
+    def test_validate_predicted_source_quotes_reports_missing_quote(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        predicted_items = (
+            self.clinical_item(
+                source_quote="Diabetes is active.",
+                source_start_char=0,
+                source_end_char=len("Diabetes is active."),
+            ),
+        )
+
+        failures = validate_predicted_source_quotes(raw_text, predicted_items)
+
+        self.assertEqual(1, len(failures))
+        self.assertEqual("source_quote_failure", failures[0].issue_type)
+        self.assertEqual(0, failures[0].predicted_index)
+        self.assertIn("source quote grounding failed", failures[0].message)
+
+    def test_validate_predicted_source_quotes_reports_wrong_offsets_even_if_quote_exists_elsewhere(self) -> None:
+        raw_text = "Assessment: Hypertension is active. Plan: Hypertension is active."
+        quote = "Hypertension is active."
+        correct_start = raw_text.index(quote)
+        wrong_start = raw_text.index("Plan")
+        predicted_items = (
+            self.clinical_item(
+                source_quote=quote,
+                source_start_char=wrong_start,
+                source_end_char=wrong_start + len(quote),
+            ),
+        )
+        self.assertIn(quote, raw_text[correct_start:])
+
+        failures = validate_predicted_source_quotes(raw_text, predicted_items)
+
+        self.assertEqual(1, len(failures))
+        self.assertEqual(0, failures[0].predicted_index)
+
+    def test_validate_predicted_source_quotes_preserves_failure_order(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        predicted_items = (
+            self.item_for_quote(raw_text, "Hypertension is active."),
+            self.clinical_item(
+                source_quote="Missing quote.",
+                source_start_char=0,
+                source_end_char=len("Missing quote."),
+            ),
+            self.clinical_item(
+                source_quote="Hypertension is active.",
+                source_start_char=0,
+                source_end_char=len("Hypertension is active."),
+            ),
+        )
+
+        failures = validate_predicted_source_quotes(raw_text, predicted_items)
+
+        self.assertEqual((1, 2), tuple(failure.predicted_index for failure in failures))
+
+    def test_validate_predicted_source_quotes_rejects_empty_raw_text(self) -> None:
+        with self.assertRaises(EvaluationError):
+            validate_predicted_source_quotes("", [self.clinical_item()])
+
+    def test_validate_predicted_source_quotes_rejects_whitespace_raw_text(self) -> None:
+        with self.assertRaises(EvaluationError):
+            validate_predicted_source_quotes("   ", [self.clinical_item()])
+
+    def test_validate_predicted_source_quotes_rejects_invalid_predicted_collection_or_entries(self) -> None:
+        with self.assertRaises(EvaluationError):
+            validate_predicted_source_quotes("Assessment text.", None)
+        with self.assertRaises(EvaluationError):
+            validate_predicted_source_quotes("Assessment text.", [object()])
+
+    def test_validate_predicted_source_quotes_does_not_mutate_predicted_items(self) -> None:
+        raw_text = "Assessment: Hypertension is active."
+        predicted_items = [self.item_for_quote(raw_text, "Hypertension is active.")]
+        original_items = list(predicted_items)
+
+        validate_predicted_source_quotes(raw_text, predicted_items)
+
+        self.assertEqual(original_items, predicted_items)
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -1105,6 +1193,16 @@ class EvaluationModelTests(unittest.TestCase):
         }
         values.update(overrides)
         return InvalidExtractionTrap(**values)
+
+    def item_for_quote(self, raw_text: str, quote: str, **overrides) -> ExtractedClinicalItem:
+        start_char = raw_text.index(quote)
+        values = {
+            "source_quote": quote,
+            "source_start_char": start_char,
+            "source_end_char": start_char + len(quote),
+        }
+        values.update(overrides)
+        return self.clinical_item(**values)
 
     def clinical_item(self, **overrides) -> ExtractedClinicalItem:
         values = {
