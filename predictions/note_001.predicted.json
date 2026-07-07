@@ -1,0 +1,65 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_001",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Hypertension.",
+      "source_start_char": 475,
+      "source_end_char": 488,
+      "section_id": "note_001:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "metformin",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Metformin 500 mg twice daily.",
+      "source_start_char": 720,
+      "source_end_char": 749,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "medication",
+      "name": "warfarin",
+      "status": "discontinued",
+      "confidence": 1.0,
+      "source_quote": "Warfarin discontinued due to bleeding risk.",
+      "source_start_char": 774,
+      "source_end_char": 817,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "procedure",
+      "name": "appendectomy",
+      "status": "performed",
+      "confidence": 1.0,
+      "source_quote": "Appendectomy in 2018.",
+      "source_start_char": 555,
+      "source_end_char": 576,
+      "section_id": "note_001:section:004",
+      "section_name": "Past Surgical History"
+    },
+    {
+      "type": "procedure",
+      "name": "circumcision",
+      "status": "not_performed",
+      "confidence": 1.0,
+      "source_quote": "Circumcision was not performed.",
+      "source_start_char": 831,
+      "source_end_char": 862,
+      "section_id": "note_001:section:008",
+      "section_name": "Procedures"
+    }
+  ]
+}
