@@ -1331,6 +1331,82 @@ class EvaluationModelTests(unittest.TestCase):
         with self.assertRaises(EvaluationError):
             evaluate_predictions("Assessment text.", self.expected_json(), [object()])
 
+    def test_note_001_expected_condition_medication_and_procedure_match_when_predicted_correctly(self) -> None:
+        raw_text = self.load_golden_note("note_001")
+        expected_json = self.load_golden_expected("note_001")
+        selected_items = [
+            self.expected_item_from_fixture(expected_json, "condition", "hypertension"),
+            self.expected_item_from_fixture(expected_json, "medication", "metformin"),
+            self.expected_item_from_fixture(expected_json, "procedure", "appendectomy"),
+        ]
+        predicted_items = tuple(
+            self.item_from_expected_fixture(raw_text, expected_item)
+            for expected_item in selected_items
+        )
+
+        result = evaluate_predictions(
+            raw_text,
+            self.expected_json(items=selected_items),
+            predicted_items,
+        )
+
+        self.assertEqual(3, result.expected_item_count)
+        self.assertEqual(3, result.predicted_item_count)
+        self.assertEqual(3, result.matched_item_count)
+        self.assertEqual(0, result.missing_item_count)
+        self.assertEqual(0, result.extra_item_count)
+        self.assertEqual(0, result.invalid_trap_hit_count)
+        self.assertEqual(0, result.source_quote_failure_count)
+        self.assertEqual(
+            (
+                ItemMatch(expected_index=0, predicted_index=0),
+                ItemMatch(expected_index=1, predicted_index=1),
+                ItemMatch(expected_index=2, predicted_index=2),
+            ),
+            result.matches,
+        )
+
+    def test_note_001_active_chest_pain_invalid_trap_is_detected(self) -> None:
+        raw_text = self.load_golden_note("note_001")
+        expected_json = self.load_golden_expected("note_001")
+        chest_pain_trap = self.invalid_trap_from_fixture(expected_json, "condition", "chest pain")
+        source_quote = "Patient denies chest pain and denies shortness of breath."
+        predicted_items = (
+            self.item_from_quote(
+                raw_text,
+                ClinicalItemType.CONDITION,
+                "chest pain",
+                "active",
+                source_quote,
+            ),
+        )
+
+        result = evaluate_predictions(
+            raw_text,
+            self.expected_json(invalid_extractions=[chest_pain_trap]),
+            predicted_items,
+        )
+
+        self.assertEqual(1, result.invalid_trap_hit_count)
+        self.assertEqual("invalid_trap_hit", result.invalid_trap_hits[0].issue_type)
+        self.assertEqual(0, result.invalid_trap_hits[0].predicted_index)
+
+    def test_note_001_source_quote_failure_is_detected_when_offsets_are_altered(self) -> None:
+        raw_text = self.load_golden_note("note_001")
+        expected_json = self.load_golden_expected("note_001")
+        expected_item = self.expected_item_from_fixture(expected_json, "condition", "hypertension")
+        predicted_item = self.item_from_expected_fixture(raw_text, expected_item, source_start_char=0)
+
+        result = evaluate_predictions(
+            raw_text,
+            self.expected_json(items=[expected_item]),
+            (predicted_item,),
+        )
+
+        self.assertEqual(1, result.source_quote_failure_count)
+        self.assertEqual("source_quote_failure", result.source_quote_failures[0].issue_type)
+        self.assertEqual(0, result.source_quote_failures[0].predicted_index)
+
     def empty_result(self, **overrides) -> EvaluationResult:
         values = {
             "expected_item_count": 0,
@@ -1346,6 +1422,66 @@ class EvaluationModelTests(unittest.TestCase):
 
     def repo_root(self) -> Path:
         return Path(__file__).resolve().parents[2]
+
+    def load_golden_note(self, note_id: str) -> str:
+        return (self.repo_root() / "golden_set" / "notes" / f"{note_id}.txt").read_text()
+
+    def load_golden_expected(self, note_id: str) -> dict:
+        with (self.repo_root() / "golden_set" / "expected" / f"{note_id}.expected.json").open() as expected_file:
+            return json.load(expected_file)
+
+    def expected_item_from_fixture(self, expected_json: dict, item_type: str, name: str) -> dict:
+        for item in expected_json["items"]:
+            if item["type"] == item_type and item["name"] == name:
+                return {
+                    "type": item["type"],
+                    "name": item["name"],
+                    "status": item.get("status"),
+                    "source_quote": item["source_quote"],
+                }
+        raise AssertionError(f"Expected fixture item not found: {item_type} {name}")
+
+    def invalid_trap_from_fixture(self, expected_json: dict, item_type: str, name: str) -> dict:
+        for trap in expected_json["invalid_extractions"]:
+            if trap["type"] == item_type and trap["name"] == name:
+                return {
+                    "type": trap["type"],
+                    "name": trap["name"],
+                    "forbidden_status": trap.get("forbidden_status"),
+                    "reason": trap.get("reason"),
+                }
+        raise AssertionError(f"Invalid fixture trap not found: {item_type} {name}")
+
+    def item_from_expected_fixture(self, raw_text: str, expected_item: dict, **overrides) -> ExtractedClinicalItem:
+        return self.item_from_quote(
+            raw_text=raw_text,
+            item_type=ClinicalItemType(expected_item["type"]),
+            name=expected_item["name"],
+            status=expected_item.get("status"),
+            source_quote=expected_item["source_quote"],
+            **overrides,
+        )
+
+    def item_from_quote(
+        self,
+        raw_text: str,
+        item_type: ClinicalItemType,
+        name: str,
+        status: str | None,
+        source_quote: str,
+        **overrides,
+    ) -> ExtractedClinicalItem:
+        start_char = raw_text.index(source_quote)
+        values = {
+            "item_type": item_type,
+            "name": name,
+            "status": status,
+            "source_quote": source_quote,
+            "source_start_char": start_char,
+            "source_end_char": start_char + len(source_quote),
+        }
+        values.update(overrides)
+        return self.clinical_item(**values)
 
     def expected_item(self, **overrides) -> ExpectedClinicalItem:
         values = {
