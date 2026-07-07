@@ -24,6 +24,7 @@ from processor.src.domain.evaluation import (
     make_match_key,
     match_expected_items,
     match_keys_compatible,
+    predicted_items_from_json,
     validate_predicted_source_quotes,
 )
 
@@ -444,6 +445,228 @@ class EvaluationModelTests(unittest.TestCase):
                 for trap in invalid_traps:
                     self.assertTrue(trap.item_type.strip())
                     self.assertTrue(trap.name.strip())
+
+    def test_predicted_items_from_json_parses_full_valid_prediction_item(self) -> None:
+        prediction_json = self.prediction_json(
+            items=[
+                self.prediction_item(
+                    type="condition",
+                    name="hypertension",
+                    status="active",
+                    confidence=0.95,
+                    source_quote="Hypertension.",
+                    source_start_char=10,
+                    source_end_char=23,
+                    section_id="note_001:section:003",
+                    section_name="Past Medical History",
+                )
+            ]
+        )
+
+        items = predicted_items_from_json(prediction_json)
+
+        self.assertEqual(1, len(items))
+        self.assertEqual(ClinicalItemType.CONDITION, items[0].item_type)
+        self.assertEqual("hypertension", items[0].name)
+        self.assertEqual("active", items[0].status)
+        self.assertEqual(0.95, items[0].confidence)
+        self.assertEqual("Hypertension.", items[0].source_quote)
+
+    def test_predicted_items_from_json_parses_minimal_valid_prediction_item(self) -> None:
+        items = predicted_items_from_json(
+            self.prediction_json(
+                items=[
+                    self.prediction_item(
+                        status=None,
+                        confidence=None,
+                    )
+                ]
+            )
+        )
+
+        self.assertEqual(1, len(items))
+        self.assertIsNone(items[0].status)
+        self.assertIsNone(items[0].confidence)
+
+    def test_predicted_items_from_json_ignores_top_level_metadata(self) -> None:
+        prediction_json = self.prediction_json(
+            schema_version="prediction-format-v1",
+            document_id="note_001",
+            extractor={"name": "manual-baseline", "version": "0.1.0"},
+            ignored_metadata="ignored",
+            items=[self.prediction_item()],
+        )
+
+        items = predicted_items_from_json(prediction_json)
+
+        self.assertEqual(1, len(items))
+        self.assertEqual("hypertension", items[0].name)
+
+    def test_predicted_items_from_json_ignores_item_level_extra_metadata(self) -> None:
+        prediction_json = self.prediction_json(
+            items=[
+                self.prediction_item(
+                    extra_field="ignored",
+                    extractor_notes={"ignored": True},
+                )
+            ]
+        )
+
+        items = predicted_items_from_json(prediction_json)
+
+        self.assertEqual(1, len(items))
+        self.assertEqual("hypertension", items[0].name)
+
+    def test_predicted_items_from_json_does_not_mutate_input_json(self) -> None:
+        prediction_json = self.prediction_json(items=[self.prediction_item(extra_field="ignored")])
+        original = copy.deepcopy(prediction_json)
+
+        predicted_items_from_json(prediction_json)
+
+        self.assertEqual(original, prediction_json)
+
+    def test_predicted_items_from_json_rejects_non_dict_top_level(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json([])
+
+    def test_predicted_items_from_json_rejects_missing_items(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json({"schema_version": "prediction-format-v1"})
+
+    def test_predicted_items_from_json_rejects_non_collection_items(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json({"items": "not a list"})
+
+    def test_predicted_items_from_json_rejects_non_dict_item_entry(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json({"items": ["not a dict"]})
+
+    def test_predicted_items_from_json_rejects_missing_required_item_fields(self) -> None:
+        required_fields = (
+            "type",
+            "name",
+            "source_quote",
+            "source_start_char",
+            "source_end_char",
+            "section_id",
+            "section_name",
+        )
+        for field_name in required_fields:
+            raw_item = self.prediction_item()
+            raw_item.pop(field_name)
+
+            with self.subTest(field_name=field_name):
+                with self.assertRaises(EvaluationError):
+                    predicted_items_from_json(self.prediction_json(items=[raw_item]))
+
+    def test_predicted_items_from_json_rejects_unknown_item_type(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json(self.prediction_json(items=[self.prediction_item(type="unknown")]))
+
+    def test_predicted_items_from_json_rejects_empty_required_string_fields(self) -> None:
+        for field_name in ("name", "source_quote", "section_id", "section_name"):
+            with self.subTest(field_name=field_name):
+                with self.assertRaises(EvaluationError):
+                    predicted_items_from_json(
+                        self.prediction_json(items=[self.prediction_item(**{field_name: "   "})])
+                    )
+
+    def test_predicted_items_from_json_rejects_negative_offsets(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json(
+                self.prediction_json(items=[self.prediction_item(source_start_char=-1)])
+            )
+
+    def test_predicted_items_from_json_rejects_end_before_start(self) -> None:
+        with self.assertRaises(EvaluationError):
+            predicted_items_from_json(
+                self.prediction_json(
+                    items=[
+                        self.prediction_item(
+                            source_start_char=10,
+                            source_end_char=9,
+                        )
+                    ]
+                )
+            )
+
+    def test_predicted_items_from_json_allows_missing_and_none_confidence(self) -> None:
+        missing_confidence_item = self.prediction_item()
+        missing_confidence_item.pop("confidence")
+        none_confidence_item = self.prediction_item(confidence=None)
+
+        items = predicted_items_from_json(
+            self.prediction_json(items=[missing_confidence_item, none_confidence_item])
+        )
+
+        self.assertIsNone(items[0].confidence)
+        self.assertIsNone(items[1].confidence)
+
+    def test_predicted_items_from_json_allows_confidence_boundary_values(self) -> None:
+        items = predicted_items_from_json(
+            self.prediction_json(
+                items=[
+                    self.prediction_item(confidence=0.0),
+                    self.prediction_item(confidence=1.0),
+                ]
+            )
+        )
+
+        self.assertEqual(0.0, items[0].confidence)
+        self.assertEqual(1.0, items[1].confidence)
+
+    def test_predicted_items_from_json_rejects_confidence_outside_range(self) -> None:
+        for confidence in (-0.1, 1.1):
+            with self.subTest(confidence=confidence):
+                with self.assertRaises(EvaluationError):
+                    predicted_items_from_json(
+                        self.prediction_json(items=[self.prediction_item(confidence=confidence)])
+                    )
+
+    def test_predicted_items_from_json_rejects_non_numeric_confidence(self) -> None:
+        for confidence in ("0.5", True):
+            with self.subTest(confidence=confidence):
+                with self.assertRaises(EvaluationError):
+                    predicted_items_from_json(
+                        self.prediction_json(items=[self.prediction_item(confidence=confidence)])
+                    )
+
+    def test_predicted_items_from_json_parses_manual_baseline_shape(self) -> None:
+        prediction_json = self.prediction_json(
+            schema_version="prediction-format-v1",
+            document_id="note_001",
+            extractor={"name": "manual-baseline", "version": "0.1.0"},
+            items=[
+                self.prediction_item(
+                    type="condition",
+                    name="hypertension",
+                    status="active",
+                    confidence=1.0,
+                    source_quote="Hypertension.",
+                    source_start_char=475,
+                    source_end_char=488,
+                    section_id="note_001:section:003",
+                    section_name="Past Medical History",
+                ),
+                self.prediction_item(
+                    type="medication",
+                    name="metformin",
+                    status="active",
+                    confidence=1.0,
+                    source_quote="Metformin 500 mg twice daily.",
+                    source_start_char=720,
+                    source_end_char=749,
+                    section_id="note_001:section:007",
+                    section_name="Medications on Discharge",
+                ),
+            ],
+        )
+
+        items = predicted_items_from_json(prediction_json)
+
+        self.assertEqual(2, len(items))
+        self.assertEqual(ClinicalItemType.CONDITION, items[0].item_type)
+        self.assertEqual(ClinicalItemType.MEDICATION, items[1].item_type)
 
     def test_make_match_key_normalizes_name(self) -> None:
         key = make_match_key("condition", " Chest Pain ")
@@ -1520,6 +1743,31 @@ class EvaluationModelTests(unittest.TestCase):
         }
         values.update(overrides)
         return self.clinical_item(**values)
+
+    def prediction_json(self, **overrides) -> dict:
+        values = {
+            "schema_version": "prediction-format-v1",
+            "document_id": "note_001",
+            "extractor": {"name": "manual-baseline", "version": "0.1.0"},
+            "items": [],
+        }
+        values.update(overrides)
+        return values
+
+    def prediction_item(self, **overrides) -> dict:
+        values = {
+            "type": "condition",
+            "name": "hypertension",
+            "status": "active",
+            "confidence": 0.95,
+            "source_quote": "Hypertension.",
+            "source_start_char": 0,
+            "source_end_char": len("Hypertension."),
+            "section_id": "note_001:section:001",
+            "section_name": "Assessment",
+        }
+        values.update(overrides)
+        return values
 
     def clinical_item(self, **overrides) -> ExtractedClinicalItem:
         values = {

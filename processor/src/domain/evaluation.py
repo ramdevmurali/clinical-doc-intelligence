@@ -5,7 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable
 
-from processor.src.domain.extraction_schema import ExtractedClinicalItem
+from processor.src.domain.extraction_schema import (
+    ClinicalItemType,
+    ExtractedClinicalItem,
+    ExtractionSchemaError,
+)
 from processor.src.domain.normalization import (
     NormalizationError,
     normalize_item_type,
@@ -188,6 +192,26 @@ def invalid_traps_from_json(expected_json: dict) -> tuple[InvalidExtractionTrap,
     )
 
 
+def predicted_items_from_json(prediction_json: dict) -> tuple[ExtractedClinicalItem, ...]:
+    """Parse saved prediction JSON into extracted clinical items."""
+
+    _require_mapping(prediction_json, "prediction_json")
+    if "items" not in prediction_json:
+        raise EvaluationError("prediction_json is missing required field items.")
+
+    raw_items = prediction_json["items"]
+    if not isinstance(raw_items, (list, tuple)):
+        raise EvaluationError("prediction_json items must be a list or tuple.")
+
+    predicted_items = []
+    for index, raw_item in enumerate(raw_items):
+        context = f"items[{index}]"
+        _require_mapping(raw_item, context)
+        predicted_items.append(_predicted_item_from_mapping(raw_item, context))
+
+    return tuple(predicted_items)
+
+
 def evaluate_predictions(
     raw_text: str,
     expected_json: dict,
@@ -219,6 +243,54 @@ def evaluate_predictions(
         invalid_trap_hits=invalid_trap_hits,
         source_quote_failures=source_quote_failures,
     )
+
+
+def _predicted_item_from_mapping(raw_item: dict, context: str) -> ExtractedClinicalItem:
+    try:
+        return ExtractedClinicalItem(
+            item_type=_prediction_item_type(_required_raw_field(raw_item, "type", context), context),
+            name=_required_raw_field(raw_item, "name", context),
+            status=raw_item.get("status"),
+            confidence=_prediction_confidence(raw_item.get("confidence"), context),
+            source_quote=_required_raw_field(raw_item, "source_quote", context),
+            source_start_char=_prediction_offset(
+                _required_raw_field(raw_item, "source_start_char", context),
+                "source_start_char",
+                context,
+            ),
+            source_end_char=_prediction_offset(
+                _required_raw_field(raw_item, "source_end_char", context),
+                "source_end_char",
+                context,
+            ),
+            section_id=_required_raw_field(raw_item, "section_id", context),
+            section_name=_required_raw_field(raw_item, "section_name", context),
+        )
+    except ExtractionSchemaError as exc:
+        raise EvaluationError(f"{context} violates prediction item schema: {exc}") from exc
+
+
+def _prediction_item_type(value: object, context: str) -> ClinicalItemType:
+    if not isinstance(value, str):
+        raise EvaluationError(f"{context} type must be a string.")
+    try:
+        return ClinicalItemType(value)
+    except ValueError as exc:
+        raise EvaluationError(f"{context} has unknown prediction item type: {value}") from exc
+
+
+def _prediction_confidence(value: object, context: str) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise EvaluationError(f"{context} confidence must be a number between 0.0 and 1.0.")
+    return float(value)
+
+
+def _prediction_offset(value: object, field_name: str, context: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise EvaluationError(f"{context} {field_name} must be an integer.")
+    return value
 
 
 def make_match_key(
@@ -461,6 +533,12 @@ def _required_field(raw_item: dict, field_name: str, context: str) -> str:
     value = raw_item[field_name]
     _require_non_empty_string(value, f"{context} {field_name}")
     return value
+
+
+def _required_raw_field(raw_item: dict, field_name: str, context: str) -> object:
+    if field_name not in raw_item:
+        raise EvaluationError(f"{context} is missing required field {field_name}.")
+    return raw_item[field_name]
 
 
 def _require_mapping(value: object, field_name: str) -> None:
