@@ -1,56 +1,85 @@
 # Clinical Document Intelligence
 
-Clinical Document Intelligence is a production-style platform for extracting, validating, reviewing, and exporting structured healthcare data from synthetic clinical notes.
-
-The project focuses on reliability concerns common in healthcare AI systems:
-
-- Source-grounded extraction from messy clinical text
-- Negation, uncertainty, and family-history handling
-- Procedure/order/status disambiguation
-- Human-in-the-loop review
-- FHIR-style JSON exports
-- Evaluation against golden clinical notes
-- Diagnostics, dead-letter queues, replay paths, and structured observability
+Clinical Document Intelligence is a source-grounded clinical extraction and
+evaluation project. The current implementation focuses on pure domain logic for
+parsing notes, validating source evidence, applying deterministic clinical
+guardrails, and evaluating extracted clinical items against golden fixtures.
 
 ## Disclaimer
 
-This project is for engineering demonstration only. It uses synthetic/demo data only. It does not provide medical advice, diagnosis, or treatment recommendations. It is not a medical device and must not be used with real patient data.
+This project uses synthetic/demo data only. It does not provide medical advice,
+diagnosis, or treatment recommendations. It is not a medical device and must not
+be used with real patient data.
 
-## Current Status
+## Current Implementation Status
 
-This repository currently contains the initial project skeleton only. It defines the intended boundaries for the backend, processor workers, frontend, infrastructure, scripts, documentation, and evaluation assets. Business logic, LLM calls, Kafka consumers, and UI implementation are intentionally not implemented yet.
+Implemented:
 
-## Architecture
+- Repository skeleton and documentation structure.
+- Pure domain section parser.
+- Source quote/span validation.
+- Clinical extraction schema primitives.
+- Deterministic normalization helpers.
+- Validation status and review primitives.
+- Deterministic clinical rule guardrails.
+- Evaluation domain harness.
+- Golden fixture tests for `note_001`.
 
-This system is designed as a document workflow:
+Not implemented yet:
 
-1. Upload or generate a synthetic clinical document.
-2. Parse the document into sections.
-3. Extract clinical entities with source quotes and spans.
-4. Validate extractions using deterministic clinical rules.
-5. Send uncertain or contradictory items to human review.
-6. Export approved structured data as FHIR-style JSON.
-7. Evaluate extraction quality against golden expected outputs.
+- Backend API.
+- Frontend UI.
+- LLM extraction.
+- Kafka/Redpanda workers.
+- Database persistence.
+- FHIR export.
+- CLI golden evaluator.
 
-See `docs/architecture.md` for the full architecture outline.
+## Current Domain Modules
 
-## Planned Services
+- `processor/src/domain/sectioning.py`: parses raw note text into ordered sections with exact source spans.
+- `processor/src/domain/source_spans.py`: validates exact source quote grounding against raw text.
+- `processor/src/domain/extraction_schema.py`: defines immutable extracted clinical item shape.
+- `processor/src/domain/normalization.py`: normalizes clinical names, item types, and statuses.
+- `processor/src/domain/validation.py`: defines validation statuses, severities, findings, and decisions.
+- `processor/src/domain/clinical_rules.py`: applies deterministic clinical safety guardrails.
+- `processor/src/domain/evaluation.py`: evaluates predicted items against golden expected labels.
 
-- `backend`: FastAPI API for documents, jobs, reviews, exports, evaluation, and diagnostics.
-- `processor`: parser, extraction, validation, and FHIR mapping workers.
-- `frontend`: React clinical review console.
-- `infra`: local Postgres and Redpanda/Kafka infrastructure.
+## Evaluation Status
 
-## Phase 1 Target
+The domain evaluator is implemented through `evaluate_predictions(...)`.
+It currently:
 
-The first implementation phase should prove the document lifecycle:
+- parses golden expected items;
+- parses invalid extraction traps;
+- matches expected and predicted items deterministically;
+- reports missing expected items;
+- reports extra predicted items;
+- detects invalid trap hits;
+- validates predicted source quote spans;
+- returns an inspectable `EvaluationResult`.
 
-- FastAPI backend shell
-- Postgres schema and migrations path
-- Document upload endpoint
-- Basic section parser worker
-- Document status lifecycle
-- Minimal React document list/viewer
-- `/health` endpoint
+Prediction JSON format is defined in `docs/prediction_format.md`. A CLI runner
+for evaluating saved prediction files is intentionally not implemented yet.
 
-Acceptance goal: upload a synthetic note, store parsed sections, and view them in the UI.
+## Key Documentation
+
+- `docs/domain_contracts.md`: stable domain contracts and invariants.
+- `docs/clinical_rules.md`: deterministic clinical rule behavior.
+- `docs/evaluation.md`: current evaluation harness behavior.
+- `docs/prediction_format.md`: saved prediction JSON contract for future CLI use.
+- `docs/architecture.md`: broader target architecture.
+
+## How to Run Tests
+
+```bash
+python3 -m unittest processor.tests.test_evaluation processor.tests.test_clinical_rules processor.tests.test_normalization processor.tests.test_extraction_schema processor.tests.test_validation processor.tests.test_source_spans processor.tests.test_sectioning -v
+```
+
+## Recommended Next Steps
+
+1. Implement prediction JSON parsing for `docs/prediction_format.md`.
+2. Add a lightweight `scripts/eval_golden.py` CLI after the prediction parser is stable.
+3. Build manual baseline prediction files for a small subset of golden notes.
+4. Expand golden notes with harder clinical ambiguity and noisier source text.
+5. Only then integrate extractor or LLM-generated predictions.
