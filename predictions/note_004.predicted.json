@@ -1,0 +1,170 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_004",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "medication",
+      "name": "apixaban",
+      "status": "stopped",
+      "confidence": 1.0,
+      "source_quote": "Apixaban 5 mg twice daily was stopped last week after melena.",
+      "source_start_char": 161,
+      "source_end_char": 222,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "medication",
+      "name": "aspirin",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Aspirin 81 mg daily is active.",
+      "source_start_char": 223,
+      "source_end_char": 253,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "medication",
+      "name": "metoprolol succinate",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Metoprolol succinate 50 mg daily is active.",
+      "source_start_char": 254,
+      "source_end_char": 297,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "medication",
+      "name": "ibuprofen",
+      "status": "discontinued",
+      "confidence": 1.0,
+      "source_quote": "Ibuprofen was discontinued and should be avoided.",
+      "source_start_char": 298,
+      "source_end_char": 347,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "medication",
+      "name": "insulin glargine",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Insulin glargine 18 units nightly is active.",
+      "source_start_char": 348,
+      "source_end_char": 392,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "medication",
+      "name": "hydrochlorothiazide",
+      "status": "held",
+      "confidence": 1.0,
+      "source_quote": "Hydrochlorothiazide held because sodium was low.",
+      "source_start_char": 393,
+      "source_end_char": 441,
+      "section_id": "note_004:section:002",
+      "section_name": "Medication History"
+    },
+    {
+      "type": "allergy",
+      "name": "sulfa antibiotics",
+      "confidence": 1.0,
+      "source_quote": "Sulfa antibiotics caused rash.",
+      "source_start_char": 476,
+      "source_end_char": 506,
+      "section_id": "note_004:section:003",
+      "section_name": "Allergies and Adverse Reactions"
+    },
+    {
+      "type": "allergy",
+      "name": "morphine",
+      "confidence": 1.0,
+      "source_quote": "Morphine caused nausea but no anaphylaxis.",
+      "source_start_char": 507,
+      "source_end_char": 549,
+      "section_id": "note_004:section:003",
+      "section_name": "Allergies and Adverse Reactions"
+    },
+    {
+      "type": "negative_finding",
+      "name": "latex allergy",
+      "confidence": 1.0,
+      "source_quote": "Patient denies latex allergy.",
+      "source_start_char": 550,
+      "source_end_char": 579,
+      "section_id": "note_004:section:003",
+      "section_name": "Allergies and Adverse Reactions"
+    },
+    {
+      "type": "condition",
+      "name": "atrial fibrillation",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Atrial fibrillation.",
+      "source_start_char": 603,
+      "source_end_char": 623,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Type 2 diabetes mellitus.",
+      "source_start_char": 624,
+      "source_end_char": 649,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Hypertension.",
+      "source_start_char": 650,
+      "source_end_char": 663,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin",
+      "confidence": 1.0,
+      "source_quote": "Hemoglobin 9.8 g/dL.",
+      "source_start_char": 671,
+      "source_end_char": 691,
+      "section_id": "note_004:section:005",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "sodium",
+      "confidence": 1.0,
+      "source_quote": "Sodium 129 mmol/L.",
+      "source_start_char": 692,
+      "source_end_char": 710,
+      "section_id": "note_004:section:005",
+      "section_name": "Labs"
+    },
+    {
+      "type": "order",
+      "name": "CBC",
+      "status": "planned",
+      "confidence": 1.0,
+      "source_quote": "Recheck CBC in one week.",
+      "source_start_char": 775,
+      "source_end_char": 799,
+      "section_id": "note_004:section:006",
+      "section_name": "Assessment"
+    }
+  ]
+}
