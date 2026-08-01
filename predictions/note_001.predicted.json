@@ -8,6 +8,17 @@
   "items": [
     {
       "type": "condition",
+      "name": "type 2 diabetes",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "The patient is a 58-year-old adult with known type 2 diabetes and hypertension who presented with three days of fatigue.",
+      "source_start_char": 208,
+      "source_end_char": 328,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
       "name": "hypertension",
       "status": "active",
       "confidence": 1.0,
@@ -18,6 +29,89 @@
       "section_name": "Past Medical History"
     },
     {
+      "type": "condition",
+      "name": "hyperlipidemia",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Hyperlipidemia.",
+      "source_start_char": 515,
+      "source_end_char": 530,
+      "section_id": "note_001:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "confidence": 1.0,
+      "source_quote": "Patient denies chest pain and denies shortness of breath.",
+      "source_start_char": 329,
+      "source_end_char": 386,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "shortness of breath",
+      "confidence": 1.0,
+      "source_quote": "Patient denies chest pain and denies shortness of breath.",
+      "source_start_char": 329,
+      "source_end_char": 386,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "diabetic ketoacidosis",
+      "confidence": 1.0,
+      "source_quote": "No evidence of diabetic ketoacidosis was found during admission.",
+      "source_start_char": 387,
+      "source_end_char": 451,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "procedure",
+      "name": "appendectomy",
+      "status": "performed",
+      "confidence": 1.0,
+      "source_quote": "Appendectomy in 2018.",
+      "source_start_char": 555,
+      "source_end_char": 576,
+      "section_id": "note_001:section:004",
+      "section_name": "Past Surgical History"
+    },
+    {
+      "type": "family_history",
+      "name": "breast cancer",
+      "confidence": 1.0,
+      "source_quote": "Mother had breast cancer.",
+      "source_start_char": 594,
+      "source_end_char": 619,
+      "section_id": "note_001:section:005",
+      "section_name": "Family History"
+    },
+    {
+      "type": "family_history",
+      "name": "coronary artery disease",
+      "confidence": 1.0,
+      "source_quote": "Father has coronary artery disease.",
+      "source_start_char": 620,
+      "source_end_char": 655,
+      "section_id": "note_001:section:005",
+      "section_name": "Family History"
+    },
+    {
+      "type": "allergy",
+      "name": "no known drug allergies",
+      "status": "none_known",
+      "confidence": 1.0,
+      "source_quote": "No known drug allergies.",
+      "source_start_char": 668,
+      "source_end_char": 692,
+      "section_id": "note_001:section:006",
+      "section_name": "Allergies"
+    },
+    {
       "type": "medication",
       "name": "metformin",
       "status": "active",
@@ -25,6 +119,17 @@
       "source_quote": "Metformin 500 mg twice daily.",
       "source_start_char": 720,
       "source_end_char": 749,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "medication",
+      "name": "lisinopril",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Lisinopril 10 mg daily.",
+      "source_start_char": 750,
+      "source_end_char": 773,
       "section_id": "note_001:section:007",
       "section_name": "Medications on Discharge"
     },
@@ -41,17 +146,6 @@
     },
     {
       "type": "procedure",
-      "name": "appendectomy",
-      "status": "performed",
-      "confidence": 1.0,
-      "source_quote": "Appendectomy in 2018.",
-      "source_start_char": 555,
-      "source_end_char": 576,
-      "section_id": "note_001:section:004",
-      "section_name": "Past Surgical History"
-    },
-    {
-      "type": "procedure",
       "name": "circumcision",
       "status": "not_performed",
       "confidence": 1.0,
@@ -60,6 +154,17 @@
       "source_end_char": 862,
       "section_id": "note_001:section:008",
       "section_name": "Procedures"
+    },
+    {
+      "type": "order",
+      "name": "primary care follow-up",
+      "status": "planned",
+      "confidence": 1.0,
+      "source_quote": "Follow up with primary care in one week.",
+      "source_start_char": 960,
+      "source_end_char": 1000,
+      "section_id": "note_001:section:009",
+      "section_name": "Assessment and Plan"
     }
   ]
 }
