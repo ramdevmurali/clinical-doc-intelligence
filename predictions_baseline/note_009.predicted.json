@@ -1,0 +1,107 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_009",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Type 2 diabetes mellitus.",
+      "source_start_char": 272,
+      "source_end_char": 297,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "major depressive disorder",
+      "status": "in_remission",
+      "confidence": 0.6,
+      "source_quote": "Major depressive disorder in remission.",
+      "source_start_char": 298,
+      "source_end_char": 337,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "obesity",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Obesity.",
+      "source_start_char": 338,
+      "source_end_char": 346,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "family_history",
+      "name": "thyroid cancer",
+      "confidence": 0.8,
+      "source_quote": "Sister has thyroid cancer.",
+      "source_start_char": 364,
+      "source_end_char": 390,
+      "section_id": "note_009:section:004",
+      "section_name": "Family History"
+    },
+    {
+      "type": "family_history",
+      "name": "osteoporosis",
+      "confidence": 0.8,
+      "source_quote": "Mother has osteoporosis.",
+      "source_start_char": 391,
+      "source_end_char": 415,
+      "section_id": "note_009:section:004",
+      "section_name": "Family History"
+    },
+    {
+      "type": "medication",
+      "name": "semaglutide",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Semaglutide 1 mg weekly.",
+      "source_start_char": 533,
+      "source_end_char": 557,
+      "section_id": "note_009:section:006",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "sertraline",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Sertraline 50 mg daily.",
+      "source_start_char": 558,
+      "source_end_char": 581,
+      "section_id": "note_009:section:006",
+      "section_name": "Medications"
+    },
+    {
+      "type": "condition",
+      "name": "diabetes above goal",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Diabetes above goal.",
+      "source_start_char": 717,
+      "source_end_char": 737,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "condition",
+      "name": "depression remains",
+      "status": "in_remission",
+      "confidence": 0.6,
+      "source_quote": "Depression remains in remission.",
+      "source_start_char": 775,
+      "source_end_char": 807,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_001",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "confidence": 0.8,
+      "source_quote": "Patient denies chest pain and denies shortness of breath.",
+      "source_start_char": 329,
+      "source_end_char": 386,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "diabetic ketoacidosis",
+      "confidence": 0.8,
+      "source_quote": "No evidence of diabetic ketoacidosis was found during admission.",
+      "source_start_char": 387,
+      "source_end_char": 451,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Hypertension.",
+      "source_start_char": 475,
+      "source_end_char": 488,
+      "section_id": "note_001:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Type 2 diabetes mellitus.",
+      "source_start_char": 489,
+      "source_end_char": 514,
+      "section_id": "note_001:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "hyperlipidemia",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Hyperlipidemia.",
+      "source_start_char": 515,
+      "source_end_char": 530,
+      "section_id": "note_001:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "procedure",
+      "name": "appendectomy",
+      "status": "performed",
+      "confidence": 0.8,
+      "source_quote": "Appendectomy in 2018.",
+      "source_start_char": 555,
+      "source_end_char": 576,
+      "section_id": "note_001:section:004",
+      "section_name": "Past Surgical History"
+    },
+    {
+      "type": "family_history",
+      "name": "breast cancer",
+      "confidence": 0.8,
+      "source_quote": "Mother had breast cancer.",
+      "source_start_char": 594,
+      "source_end_char": 619,
+      "section_id": "note_001:section:005",
+      "section_name": "Family History"
+    },
+    {
+      "type": "family_history",
+      "name": "coronary artery disease",
+      "confidence": 0.8,
+      "source_quote": "Father has coronary artery disease.",
+      "source_start_char": 620,
+      "source_end_char": 655,
+      "section_id": "note_001:section:005",
+      "section_name": "Family History"
+    },
+    {
+      "type": "medication",
+      "name": "metformin",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Metformin 500 mg twice daily.",
+      "source_start_char": 720,
+      "source_end_char": 749,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "medication",
+      "name": "lisinopril",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Lisinopril 10 mg daily.",
+      "source_start_char": 750,
+      "source_end_char": 773,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "medication",
+      "name": "warfarin",
+      "status": "discontinued",
+      "confidence": 0.8,
+      "source_quote": "Warfarin discontinued due to bleeding risk.",
+      "source_start_char": 774,
+      "source_end_char": 817,
+      "section_id": "note_001:section:007",
+      "section_name": "Medications on Discharge"
+    },
+    {
+      "type": "procedure",
+      "name": "circumcision",
+      "status": "not_performed",
+      "confidence": 0.8,
+      "source_quote": "Circumcision was not performed.",
+      "source_start_char": 831,
+      "source_end_char": 862,
+      "section_id": "note_001:section:008",
+      "section_name": "Procedures"
+    }
+  ]
+}

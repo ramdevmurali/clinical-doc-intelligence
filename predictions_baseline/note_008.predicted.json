@@ -1,0 +1,96 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_008",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "negative_finding",
+      "name": "hemoptysis",
+      "confidence": 0.8,
+      "source_quote": "Denies hemoptysis.",
+      "source_start_char": 192,
+      "source_end_char": 210,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "night sweats",
+      "confidence": 0.8,
+      "source_quote": "Denies night sweats.",
+      "source_start_char": 211,
+      "source_end_char": 231,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "former tobacco use",
+      "status": "historical",
+      "confidence": 0.6,
+      "source_quote": "Former tobacco use.",
+      "source_start_char": 376,
+      "source_end_char": 395,
+      "section_id": "note_008:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "gastroesophageal reflux disease",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Gastroesophageal reflux disease.",
+      "source_start_char": 396,
+      "source_end_char": 428,
+      "section_id": "note_008:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "omeprazole",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Omeprazole 20 mg daily.",
+      "source_start_char": 443,
+      "source_end_char": 466,
+      "section_id": "note_008:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "condition",
+      "name": "possible early pneumonia",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Possible early pneumonia.",
+      "source_start_char": 666,
+      "source_end_char": 691,
+      "section_id": "note_008:section:007",
+      "section_name": "Assessment"
+    },
+    {
+      "type": "condition",
+      "name": "atelectasis also possible",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Atelectasis also possible.",
+      "source_start_char": 692,
+      "source_end_char": 718,
+      "section_id": "note_008:section:007",
+      "section_name": "Assessment"
+    },
+    {
+      "type": "condition",
+      "name": "low suspicion for malignancy",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Low suspicion for malignancy.",
+      "source_start_char": 719,
+      "source_end_char": 748,
+      "section_id": "note_008:section:007",
+      "section_name": "Assessment"
+    }
+  ]
+}

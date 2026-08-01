@@ -1,0 +1,53 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_005",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "family_history",
+      "name": "colon cancer",
+      "confidence": 0.8,
+      "source_quote": "Father had colon cancer at age 70.",
+      "source_start_char": 236,
+      "source_end_char": 270,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "procedure",
+      "name": "flexible sigmoidoscopy was",
+      "status": "performed",
+      "confidence": 0.8,
+      "source_quote": "Flexible sigmoidoscopy was performed today and showed internal hemorrhoids.",
+      "source_start_char": 284,
+      "source_end_char": 359,
+      "section_id": "note_005:section:003",
+      "section_name": "Procedures"
+    },
+    {
+      "type": "procedure",
+      "name": "colonoscopy",
+      "status": "not_performed",
+      "confidence": 0.8,
+      "source_quote": "Colonoscopy was not performed because bowel preparation was incomplete.",
+      "source_start_char": 360,
+      "source_end_char": 431,
+      "section_id": "note_005:section:003",
+      "section_name": "Procedures"
+    },
+    {
+      "type": "condition",
+      "name": "rectal bleeding likely from hemorrhoids, but colonoscopy is needed to evaluate positive fit",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Rectal bleeding likely from hemorrhoids, but colonoscopy is needed to evaluate positive FIT.",
+      "source_start_char": 581,
+      "source_end_char": 673,
+      "section_id": "note_005:section:005",
+      "section_name": "Assessment"
+    }
+  ]
+}

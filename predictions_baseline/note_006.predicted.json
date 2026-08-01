@@ -1,0 +1,86 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_006",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "negative_finding",
+      "name": "dizziness",
+      "confidence": 0.8,
+      "source_quote": "Denies dizziness, syncope, and leg swelling.",
+      "source_start_char": 183,
+      "source_end_char": 227,
+      "section_id": "note_006:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "chronic kidney disease stage 3b",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Chronic kidney disease stage 3b.",
+      "source_start_char": 251,
+      "source_end_char": 283,
+      "section_id": "note_006:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Hypertension.",
+      "source_start_char": 284,
+      "source_end_char": 297,
+      "section_id": "note_006:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "gout",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Gout.",
+      "source_start_char": 298,
+      "source_end_char": 303,
+      "section_id": "note_006:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "losartan",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Losartan 50 mg daily.",
+      "source_start_char": 318,
+      "source_end_char": 339,
+      "section_id": "note_006:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "allopurinol",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Allopurinol 100 mg daily.",
+      "source_start_char": 340,
+      "source_end_char": 365,
+      "section_id": "note_006:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Hypertension uncontrolled.",
+      "source_start_char": 642,
+      "source_end_char": 668,
+      "section_id": "note_006:section:008",
+      "section_name": "Assessment and Plan"
+    }
+  ]
+}

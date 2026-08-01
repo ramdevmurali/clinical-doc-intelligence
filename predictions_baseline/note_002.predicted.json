@@ -1,0 +1,64 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_002",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "confidence": 0.8,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "asthma, mild intermittent",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Asthma, mild intermittent.",
+      "source_start_char": 349,
+      "source_end_char": 375,
+      "section_id": "note_002:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "albuterol inhaler",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Albuterol inhaler as needed.",
+      "source_start_char": 427,
+      "source_end_char": 455,
+      "section_id": "note_002:section:005",
+      "section_name": "Medications"
+    },
+    {
+      "type": "condition",
+      "name": "abdominal pain with leukocytosis",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Abdominal pain with leukocytosis.",
+      "source_start_char": 739,
+      "source_end_char": 772,
+      "section_id": "note_002:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "condition",
+      "name": "await ct results before surgical consultation",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Await CT results before surgical consultation.",
+      "source_start_char": 773,
+      "source_end_char": 819,
+      "section_id": "note_002:section:009",
+      "section_name": "Assessment and Plan"
+    }
+  ]
+}

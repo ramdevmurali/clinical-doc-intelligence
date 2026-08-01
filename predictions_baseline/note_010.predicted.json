@@ -1,0 +1,109 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_010",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "patient tolerated the procedure well",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Patient tolerated the procedure well.",
+      "source_start_char": 198,
+      "source_end_char": 235,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "no bile leak",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "No bile leak.",
+      "source_start_char": 236,
+      "source_end_char": 249,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "no wound infection",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "No wound infection.",
+      "source_start_char": 250,
+      "source_end_char": 269,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "mild postoperative nausea",
+      "status": "resolved",
+      "confidence": 0.6,
+      "source_quote": "Mild postoperative nausea resolved before discharge.",
+      "source_start_char": 270,
+      "source_end_char": 322,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "migraine headaches",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Migraine headaches.",
+      "source_start_char": 346,
+      "source_end_char": 365,
+      "section_id": "note_010:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "anxiety disorder",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Anxiety disorder.",
+      "source_start_char": 366,
+      "source_end_char": 383,
+      "section_id": "note_010:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "acetaminophen",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Acetaminophen 650 mg every six hours as needed for pain.",
+      "source_start_char": 398,
+      "source_end_char": 454,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "oxycodone",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Oxycodone 5 mg every six hours as needed for severe pain, dispense eight tablets.",
+      "source_start_char": 455,
+      "source_end_char": 536,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "sumatriptan",
+      "status": "active",
+      "confidence": 0.8,
+      "source_quote": "Sumatriptan 50 mg as needed for migraine.",
+      "source_start_char": 537,
+      "source_end_char": 578,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    }
+  ]
+}

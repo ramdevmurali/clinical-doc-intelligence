@@ -1,0 +1,86 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_004",
+  "extractor": {
+    "name": "deterministic-baseline",
+    "version": "baseline-extractor-v1"
+  },
+  "items": [
+    {
+      "type": "negative_finding",
+      "name": "latex allergy",
+      "confidence": 0.8,
+      "source_quote": "Patient denies latex allergy.",
+      "source_start_char": 550,
+      "source_end_char": 579,
+      "section_id": "note_004:section:003",
+      "section_name": "Allergies and Adverse Reactions"
+    },
+    {
+      "type": "condition",
+      "name": "atrial fibrillation",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Atrial fibrillation.",
+      "source_start_char": 603,
+      "source_end_char": 623,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Type 2 diabetes mellitus.",
+      "source_start_char": 624,
+      "source_end_char": 649,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "hypertension",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Hypertension.",
+      "source_start_char": 650,
+      "source_end_char": 663,
+      "section_id": "note_004:section:004",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "medication reconciliation completed",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Medication reconciliation completed.",
+      "source_start_char": 724,
+      "source_end_char": 760,
+      "section_id": "note_004:section:006",
+      "section_name": "Assessment"
+    },
+    {
+      "type": "condition",
+      "name": "avoid nsaids",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Avoid NSAIDs.",
+      "source_start_char": 761,
+      "source_end_char": 774,
+      "section_id": "note_004:section:006",
+      "section_name": "Assessment"
+    },
+    {
+      "type": "condition",
+      "name": "recheck cbc in one week",
+      "status": "active",
+      "confidence": 0.6,
+      "source_quote": "Recheck CBC in one week.",
+      "source_start_char": 775,
+      "source_end_char": 799,
+      "section_id": "note_004:section:006",
+      "section_name": "Assessment"
+    }
+  ]
+}
