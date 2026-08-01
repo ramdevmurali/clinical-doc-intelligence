@@ -1,0 +1,139 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_005",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "positive fecal immunochemical test",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Positive fecal immunochemical test and intermittent rectal bleeding.",
+      "source_start_char": 82,
+      "source_end_char": 150,
+      "section_id": "note_005:section:001",
+      "section_name": "Reason for Referral"
+    },
+    {
+      "type": "condition",
+      "name": "rectal bleeding",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Positive fecal immunochemical test and intermittent rectal bleeding.",
+      "source_start_char": 82,
+      "source_end_char": 150,
+      "section_id": "note_005:section:001",
+      "section_name": "Reason for Referral"
+    },
+    {
+      "type": "condition",
+      "name": "iron deficiency anemia",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "The patient has iron deficiency anemia.",
+      "source_start_char": 161,
+      "source_end_char": 200,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "weight loss",
+      "confidence": 1.0,
+      "source_quote": "No weight loss.",
+      "source_start_char": 201,
+      "source_end_char": 216,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "abdominal pain",
+      "confidence": 1.0,
+      "source_quote": "No abdominal pain.",
+      "source_start_char": 217,
+      "source_end_char": 235,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "family_history",
+      "name": "colon cancer",
+      "confidence": 1.0,
+      "source_quote": "Father had colon cancer at age 70.",
+      "source_start_char": 236,
+      "source_end_char": 270,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "procedure",
+      "name": "flexible sigmoidoscopy",
+      "status": "performed",
+      "confidence": 1.0,
+      "source_quote": "Flexible sigmoidoscopy was performed today and showed internal hemorrhoids.",
+      "source_start_char": 284,
+      "source_end_char": 359,
+      "section_id": "note_005:section:003",
+      "section_name": "Procedures"
+    },
+    {
+      "type": "condition",
+      "name": "internal hemorrhoids",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Flexible sigmoidoscopy was performed today and showed internal hemorrhoids.",
+      "source_start_char": 284,
+      "source_end_char": 359,
+      "section_id": "note_005:section:003",
+      "section_name": "Procedures"
+    },
+    {
+      "type": "procedure",
+      "name": "colonoscopy",
+      "status": "not_performed",
+      "confidence": 1.0,
+      "source_quote": "Colonoscopy was not performed because bowel preparation was incomplete.",
+      "source_start_char": 360,
+      "source_end_char": 431,
+      "section_id": "note_005:section:003",
+      "section_name": "Procedures"
+    },
+    {
+      "type": "order",
+      "name": "outpatient colonoscopy",
+      "status": "referred",
+      "confidence": 1.0,
+      "source_quote": "Patient referred for outpatient colonoscopy.",
+      "source_start_char": 455,
+      "source_end_char": 499,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
+    },
+    {
+      "type": "order",
+      "name": "iron studies",
+      "status": "ordered",
+      "confidence": 1.0,
+      "source_quote": "Iron studies ordered.",
+      "source_start_char": 500,
+      "source_end_char": 521,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
+    },
+    {
+      "type": "medication",
+      "name": "ferrous sulfate",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Start ferrous sulfate 325 mg every other day.",
+      "source_start_char": 522,
+      "source_end_char": 567,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
+    }
+  ]
+}

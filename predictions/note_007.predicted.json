@@ -1,0 +1,105 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_007",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "allergy",
+      "name": "amoxicillin",
+      "confidence": 1.0,
+      "source_quote": "Patient reports hives after amoxicillin as a child.",
+      "source_start_char": 144,
+      "source_end_char": 195,
+      "section_id": "note_007:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "anaphylaxis",
+      "confidence": 1.0,
+      "source_quote": "Patient denies anaphylaxis.",
+      "source_start_char": 196,
+      "source_end_char": 223,
+      "section_id": "note_007:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "allergy",
+      "name": "shellfish",
+      "confidence": 1.0,
+      "source_quote": "Shellfish causes throat itching.",
+      "source_start_char": 224,
+      "source_end_char": 256,
+      "section_id": "note_007:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "allergy",
+      "name": "iodine",
+      "status": "removed_incorrect",
+      "confidence": 1.0,
+      "source_quote": "The chart listed iodine allergy, but patient states iodine allergy is incorrect.",
+      "source_start_char": 257,
+      "source_end_char": 337,
+      "section_id": "note_007:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "latex allergy",
+      "confidence": 1.0,
+      "source_quote": "Patient denies latex allergy.",
+      "source_start_char": 338,
+      "source_end_char": 367,
+      "section_id": "note_007:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "condition",
+      "name": "seasonal allergic rhinitis",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Seasonal allergic rhinitis.",
+      "source_start_char": 391,
+      "source_end_char": 418,
+      "section_id": "note_007:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "eczema",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Eczema.",
+      "source_start_char": 419,
+      "source_end_char": 426,
+      "section_id": "note_007:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "cetirizine",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Cetirizine 10 mg daily.",
+      "source_start_char": 441,
+      "source_end_char": 464,
+      "section_id": "note_007:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "epinephrine autoinjector",
+      "status": "prescribed",
+      "confidence": 1.0,
+      "source_quote": "Epinephrine autoinjector prescribed today for shellfish reaction risk.",
+      "source_start_char": 465,
+      "source_end_char": 535,
+      "section_id": "note_007:section:004",
+      "section_name": "Medications"
+    }
+  ]
+}

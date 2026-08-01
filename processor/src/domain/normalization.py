@@ -39,6 +39,7 @@ _STATUS_VALUES: frozenset[str] = frozenset(
         "discontinued",
         "held",
         "prescribed",
+        "removed_incorrect",
         "none_known",
         "possible",
         "rule_out",

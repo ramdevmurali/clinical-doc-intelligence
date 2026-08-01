@@ -1,0 +1,201 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_009",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "type 2 diabetes mellitus",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Type 2 diabetes mellitus.",
+      "source_start_char": 272,
+      "source_end_char": 297,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "major depressive disorder",
+      "status": "in_remission",
+      "confidence": 1.0,
+      "source_quote": "Major depressive disorder in remission.",
+      "source_start_char": 298,
+      "source_end_char": 337,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "obesity",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Obesity.",
+      "source_start_char": 338,
+      "source_end_char": 346,
+      "section_id": "note_009:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "polyuria",
+      "confidence": 1.0,
+      "source_quote": "No polyuria.",
+      "source_start_char": 204,
+      "source_end_char": 216,
+      "section_id": "note_009:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "foot ulcers",
+      "confidence": 1.0,
+      "source_quote": "No foot ulcers.",
+      "source_start_char": 217,
+      "source_end_char": 232,
+      "section_id": "note_009:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "family_history",
+      "name": "thyroid cancer",
+      "confidence": 1.0,
+      "source_quote": "Sister has thyroid cancer.",
+      "source_start_char": 364,
+      "source_end_char": 390,
+      "section_id": "note_009:section:004",
+      "section_name": "Family History"
+    },
+    {
+      "type": "family_history",
+      "name": "osteoporosis",
+      "confidence": 1.0,
+      "source_quote": "Mother has osteoporosis.",
+      "source_start_char": 391,
+      "source_end_char": 415,
+      "section_id": "note_009:section:004",
+      "section_name": "Family History"
+    },
+    {
+      "type": "condition",
+      "name": "former smoker",
+      "status": "historical",
+      "confidence": 1.0,
+      "source_quote": "Former smoker, quit in 2020.",
+      "source_start_char": 433,
+      "source_end_char": 461,
+      "section_id": "note_009:section:005",
+      "section_name": "Social History"
+    },
+    {
+      "type": "medication",
+      "name": "semaglutide",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Semaglutide 1 mg weekly.",
+      "source_start_char": 533,
+      "source_end_char": 557,
+      "section_id": "note_009:section:006",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "sertraline",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Sertraline 50 mg daily.",
+      "source_start_char": 558,
+      "source_end_char": 581,
+      "section_id": "note_009:section:006",
+      "section_name": "Medications"
+    },
+    {
+      "type": "observation",
+      "name": "BMI",
+      "confidence": 1.0,
+      "source_quote": "BMI 33 kg/m2.",
+      "source_start_char": 591,
+      "source_end_char": 604,
+      "section_id": "note_009:section:007",
+      "section_name": "Vitals"
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin A1c",
+      "confidence": 1.0,
+      "source_quote": "Hemoglobin A1c 7.4 percent.",
+      "source_start_char": 640,
+      "source_end_char": 667,
+      "section_id": "note_009:section:008",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "LDL cholesterol",
+      "confidence": 1.0,
+      "source_quote": "LDL cholesterol 118 mg/dL.",
+      "source_start_char": 668,
+      "source_end_char": 694,
+      "section_id": "note_009:section:008",
+      "section_name": "Labs"
+    },
+    {
+      "type": "condition",
+      "name": "diabetes above goal",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Diabetes above goal.",
+      "source_start_char": 717,
+      "source_end_char": 737,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "medication",
+      "name": "semaglutide",
+      "status": "planned_change",
+      "confidence": 1.0,
+      "source_quote": "Increase semaglutide to 2 mg weekly.",
+      "source_start_char": 738,
+      "source_end_char": 774,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "order",
+      "name": "urine albumin",
+      "status": "ordered",
+      "confidence": 1.0,
+      "source_quote": "Order urine albumin and lipid panel.",
+      "source_start_char": 808,
+      "source_end_char": 844,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "order",
+      "name": "lipid panel",
+      "status": "ordered",
+      "confidence": 1.0,
+      "source_quote": "Order urine albumin and lipid panel.",
+      "source_start_char": 808,
+      "source_end_char": 844,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "order",
+      "name": "diabetic eye exam",
+      "status": "referred",
+      "confidence": 1.0,
+      "source_quote": "Refer for diabetic eye exam.",
+      "source_start_char": 845,
+      "source_end_char": 873,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_010",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "procedure",
+      "name": "laparoscopic cholecystectomy",
+      "status": "performed",
+      "confidence": 1.0,
+      "source_quote": "Laparoscopic cholecystectomy performed for symptomatic cholelithiasis.",
+      "source_start_char": 109,
+      "source_end_char": 179,
+      "section_id": "note_010:section:001",
+      "section_name": "Unknown: Procedure"
+    },
+    {
+      "type": "condition",
+      "name": "symptomatic cholelithiasis",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Laparoscopic cholecystectomy performed for symptomatic cholelithiasis.",
+      "source_start_char": 109,
+      "source_end_char": 179,
+      "section_id": "note_010:section:001",
+      "section_name": "Unknown: Procedure"
+    },
+    {
+      "type": "negative_finding",
+      "name": "bile leak",
+      "confidence": 1.0,
+      "source_quote": "No bile leak.",
+      "source_start_char": 236,
+      "source_end_char": 249,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "negative_finding",
+      "name": "wound infection",
+      "confidence": 1.0,
+      "source_quote": "No wound infection.",
+      "source_start_char": 250,
+      "source_end_char": 269,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "postoperative nausea",
+      "status": "resolved",
+      "confidence": 1.0,
+      "source_quote": "Mild postoperative nausea resolved before discharge.",
+      "source_start_char": 270,
+      "source_end_char": 322,
+      "section_id": "note_010:section:002",
+      "section_name": "Hospital Course"
+    },
+    {
+      "type": "condition",
+      "name": "migraine headaches",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Migraine headaches.",
+      "source_start_char": 346,
+      "source_end_char": 365,
+      "section_id": "note_010:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "anxiety disorder",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Anxiety disorder.",
+      "source_start_char": 366,
+      "source_end_char": 383,
+      "section_id": "note_010:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "acetaminophen",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Acetaminophen 650 mg every six hours as needed for pain.",
+      "source_start_char": 398,
+      "source_end_char": 454,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "oxycodone",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Oxycodone 5 mg every six hours as needed for severe pain, dispense eight tablets.",
+      "source_start_char": 455,
+      "source_end_char": 536,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "sumatriptan",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Sumatriptan 50 mg as needed for migraine.",
+      "source_start_char": 537,
+      "source_end_char": 578,
+      "section_id": "note_010:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "allergy",
+      "name": "codeine",
+      "confidence": 1.0,
+      "source_quote": "Codeine causes itching.",
+      "source_start_char": 591,
+      "source_end_char": 614,
+      "section_id": "note_010:section:005",
+      "section_name": "Allergies"
+    },
+    {
+      "type": "care_need",
+      "name": "lifting restriction",
+      "confidence": 1.0,
+      "source_quote": "Do not lift more than 10 pounds for two weeks.",
+      "source_start_char": 640,
+      "source_end_char": 686,
+      "section_id": "note_010:section:006",
+      "section_name": "Discharge Instructions"
+    },
+    {
+      "type": "care_need",
+      "name": "incision care",
+      "confidence": 1.0,
+      "source_quote": "Keep incision clean and dry.",
+      "source_start_char": 687,
+      "source_end_char": 715,
+      "section_id": "note_010:section:006",
+      "section_name": "Discharge Instructions"
+    },
+    {
+      "type": "order",
+      "name": "surgery clinic follow-up",
+      "status": "planned",
+      "confidence": 1.0,
+      "source_quote": "Follow up with surgery clinic in 10 days.",
+      "source_start_char": 716,
+      "source_end_char": 757,
+      "section_id": "note_010:section:006",
+      "section_name": "Discharge Instructions"
+    },
+    {
+      "type": "care_need",
+      "name": "return precautions",
+      "confidence": 1.0,
+      "source_quote": "Return for fever, worsening abdominal pain, jaundice, or drainage from incision.",
+      "source_start_char": 758,
+      "source_end_char": 838,
+      "section_id": "note_010:section:006",
+      "section_name": "Discharge Instructions"
+    },
+    {
+      "type": "order",
+      "name": "pathology report",
+      "status": "pending",
+      "confidence": 1.0,
+      "source_quote": "Pathology report pending.",
+      "source_start_char": 856,
+      "source_end_char": 881,
+      "section_id": "note_010:section:007",
+      "section_name": "Pending Orders"
+    }
+  ]
+}

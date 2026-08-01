@@ -1,0 +1,161 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_008",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "dry cough",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Patient has two weeks of dry cough and fatigue.",
+      "source_start_char": 144,
+      "source_end_char": 191,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "fatigue",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Patient has two weeks of dry cough and fatigue.",
+      "source_start_char": 144,
+      "source_end_char": 191,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "hemoptysis",
+      "confidence": 1.0,
+      "source_quote": "Denies hemoptysis.",
+      "source_start_char": 192,
+      "source_end_char": 210,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "night sweats",
+      "confidence": 1.0,
+      "source_quote": "Denies night sweats.",
+      "source_start_char": 211,
+      "source_end_char": 231,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "early pneumonia",
+      "status": "possible",
+      "confidence": 1.0,
+      "source_quote": "CT chest suggests possible early pneumonia versus atelectasis.",
+      "source_start_char": 232,
+      "source_end_char": 294,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "atelectasis",
+      "status": "possible",
+      "confidence": 1.0,
+      "source_quote": "CT chest suggests possible early pneumonia versus atelectasis.",
+      "source_start_char": 232,
+      "source_end_char": 294,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "malignancy",
+      "status": "unlikely_not_excluded",
+      "confidence": 1.0,
+      "source_quote": "Malignancy is considered unlikely but not fully excluded.",
+      "source_start_char": 295,
+      "source_end_char": 352,
+      "section_id": "note_008:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "former tobacco use",
+      "status": "historical",
+      "confidence": 1.0,
+      "source_quote": "Former tobacco use.",
+      "source_start_char": 376,
+      "source_end_char": 395,
+      "section_id": "note_008:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "gastroesophageal reflux disease",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Gastroesophageal reflux disease.",
+      "source_start_char": 396,
+      "source_end_char": 428,
+      "section_id": "note_008:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "medication",
+      "name": "omeprazole",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Omeprazole 20 mg daily.",
+      "source_start_char": 443,
+      "source_end_char": 466,
+      "section_id": "note_008:section:004",
+      "section_name": "Medications"
+    },
+    {
+      "type": "observation",
+      "name": "right lower lobe opacity",
+      "status": "present",
+      "confidence": 1.0,
+      "source_quote": "CT chest shows mild right lower lobe opacity.",
+      "source_start_char": 477,
+      "source_end_char": 522,
+      "section_id": "note_008:section:005",
+      "section_name": "Imaging"
+    },
+    {
+      "type": "negative_finding",
+      "name": "pulmonary embolism",
+      "confidence": 1.0,
+      "source_quote": "No pulmonary embolism.",
+      "source_start_char": 523,
+      "source_end_char": 545,
+      "section_id": "note_008:section:005",
+      "section_name": "Imaging"
+    },
+    {
+      "type": "order",
+      "name": "repeat chest x-ray",
+      "status": "planned",
+      "confidence": 1.0,
+      "source_quote": "Repeat chest x-ray in six weeks.",
+      "source_start_char": 555,
+      "source_end_char": 587,
+      "section_id": "note_008:section:006",
+      "section_name": "Orders"
+    },
+    {
+      "type": "medication",
+      "name": "azithromycin",
+      "status": "started",
+      "confidence": 1.0,
+      "source_quote": "Start azithromycin 500 mg today then 250 mg daily for four days.",
+      "source_start_char": 588,
+      "source_end_char": 652,
+      "section_id": "note_008:section:006",
+      "section_name": "Orders"
+    }
+  ]
+}
