@@ -1,0 +1,199 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_003",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "congestive heart failure with reduced ejection fraction",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Congestive heart failure with reduced ejection fraction.",
+      "source_start_char": 189,
+      "source_end_char": 245,
+      "section_id": "note_003:section:002",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "chronic obstructive pulmonary disease",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Chronic obstructive pulmonary disease.",
+      "source_start_char": 246,
+      "source_end_char": 284,
+      "section_id": "note_003:section:002",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "condition",
+      "name": "chronic kidney disease stage 3",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Chronic kidney disease stage 3.",
+      "source_start_char": 285,
+      "source_end_char": 316,
+      "section_id": "note_003:section:002",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "confidence": 1.0,
+      "source_quote": "No chest pain.",
+      "source_start_char": 131,
+      "source_end_char": 145,
+      "section_id": "note_003:section:001",
+      "section_name": "Subjective"
+    },
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "confidence": 1.0,
+      "source_quote": "No fever or chills.",
+      "source_start_char": 146,
+      "source_end_char": 165,
+      "section_id": "note_003:section:001",
+      "section_name": "Subjective"
+    },
+    {
+      "type": "family_history",
+      "name": "myocardial infarction",
+      "confidence": 1.0,
+      "source_quote": "Brother died of myocardial infarction at age 52.",
+      "source_start_char": 334,
+      "source_end_char": 382,
+      "section_id": "note_003:section:003",
+      "section_name": "Family History"
+    },
+    {
+      "type": "observation",
+      "name": "oxygen saturation",
+      "confidence": 1.0,
+      "source_quote": "Oxygen saturation 92% on 2 L nasal cannula.",
+      "source_start_char": 445,
+      "source_end_char": 488,
+      "section_id": "note_003:section:004",
+      "section_name": "Vitals"
+    },
+    {
+      "type": "observation",
+      "name": "bibasilar crackles",
+      "status": "present",
+      "confidence": 1.0,
+      "source_quote": "Bibasilar crackles present.",
+      "source_start_char": 505,
+      "source_end_char": 532,
+      "section_id": "note_003:section:005",
+      "section_name": "Physical Exam"
+    },
+    {
+      "type": "lab_result",
+      "name": "potassium",
+      "confidence": 1.0,
+      "source_quote": "Potassium 3.2 mmol/L.",
+      "source_start_char": 578,
+      "source_end_char": 599,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "confidence": 1.0,
+      "source_quote": "Creatinine 1.9 mg/dL.",
+      "source_start_char": 600,
+      "source_end_char": 621,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "BNP",
+      "confidence": 1.0,
+      "source_quote": "BNP 820 pg/mL.",
+      "source_start_char": 622,
+      "source_end_char": 636,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "observation",
+      "name": "pulmonary vascular congestion",
+      "status": "present",
+      "confidence": 1.0,
+      "source_quote": "Chest x-ray shows pulmonary vascular congestion.",
+      "source_start_char": 647,
+      "source_end_char": 695,
+      "section_id": "note_003:section:007",
+      "section_name": "Imaging"
+    },
+    {
+      "type": "negative_finding",
+      "name": "focal pneumonia",
+      "confidence": 1.0,
+      "source_quote": "No focal pneumonia.",
+      "source_start_char": 696,
+      "source_end_char": 715,
+      "section_id": "note_003:section:007",
+      "section_name": "Imaging"
+    },
+    {
+      "type": "medication",
+      "name": "furosemide",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Furosemide 40 mg IV twice daily.",
+      "source_start_char": 730,
+      "source_end_char": 762,
+      "section_id": "note_003:section:008",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "lisinopril",
+      "status": "held",
+      "confidence": 1.0,
+      "source_quote": "Lisinopril held due to acute kidney injury.",
+      "source_start_char": 763,
+      "source_end_char": 806,
+      "section_id": "note_003:section:008",
+      "section_name": "Medications"
+    },
+    {
+      "type": "medication",
+      "name": "prednisone",
+      "status": "stopped",
+      "confidence": 1.0,
+      "source_quote": "Prednisone stopped yesterday.",
+      "source_start_char": 807,
+      "source_end_char": 836,
+      "section_id": "note_003:section:008",
+      "section_name": "Medications"
+    },
+    {
+      "type": "condition",
+      "name": "acute on chronic heart failure exacerbation",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Acute on chronic heart failure exacerbation.",
+      "source_start_char": 859,
+      "source_end_char": 903,
+      "section_id": "note_003:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "care_need",
+      "name": "monitor renal function",
+      "confidence": 1.0,
+      "source_quote": "Monitor renal function.",
+      "source_start_char": 945,
+      "source_end_char": 968,
+      "section_id": "note_003:section:009",
+      "section_name": "Assessment and Plan"
+    }
+  ]
+}

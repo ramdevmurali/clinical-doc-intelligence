@@ -1,0 +1,168 @@
+{
+  "schema_version": "prediction-format-v1",
+  "document_id": "note_002",
+  "extractor": {
+    "name": "manual-baseline",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "type": "condition",
+      "name": "right lower quadrant abdominal pain",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "A 34-year-old adult presents with twelve hours of right lower quadrant pain and nausea.",
+      "source_start_char": 142,
+      "source_end_char": 229,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "nausea",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "A 34-year-old adult presents with twelve hours of right lower quadrant pain and nausea.",
+      "source_start_char": 142,
+      "source_end_char": 229,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "confidence": 1.0,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "vomiting",
+      "confidence": 1.0,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "dysuria",
+      "confidence": 1.0,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "uncertain_mention",
+      "name": "appendicitis",
+      "status": "rule_out",
+      "confidence": 1.0,
+      "source_quote": "Appendicitis is being ruled out.",
+      "source_start_char": 293,
+      "source_end_char": 325,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "condition",
+      "name": "asthma",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Asthma, mild intermittent.",
+      "source_start_char": 349,
+      "source_end_char": 375,
+      "section_id": "note_002:section:003",
+      "section_name": "Past Medical History"
+    },
+    {
+      "type": "allergy",
+      "name": "penicillin",
+      "confidence": 1.0,
+      "source_quote": "Penicillin causes hives.",
+      "source_start_char": 388,
+      "source_end_char": 412,
+      "section_id": "note_002:section:004",
+      "section_name": "Allergies"
+    },
+    {
+      "type": "medication",
+      "name": "albuterol inhaler",
+      "status": "active",
+      "confidence": 1.0,
+      "source_quote": "Albuterol inhaler as needed.",
+      "source_start_char": 427,
+      "source_end_char": 455,
+      "section_id": "note_002:section:005",
+      "section_name": "Medications"
+    },
+    {
+      "type": "observation",
+      "name": "heart rate",
+      "confidence": 1.0,
+      "source_quote": "Heart rate 104 bpm.",
+      "source_start_char": 485,
+      "source_end_char": 504,
+      "section_id": "note_002:section:006",
+      "section_name": "Vitals"
+    },
+    {
+      "type": "lab_result",
+      "name": "white blood cell count",
+      "confidence": 1.0,
+      "source_quote": "White blood cell count 13.2 K/uL.",
+      "source_start_char": 575,
+      "source_end_char": 608,
+      "section_id": "note_002:section:007",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "confidence": 1.0,
+      "source_quote": "Creatinine 0.8 mg/dL.",
+      "source_start_char": 609,
+      "source_end_char": 630,
+      "section_id": "note_002:section:007",
+      "section_name": "Labs"
+    },
+    {
+      "type": "order",
+      "name": "CT abdomen and pelvis",
+      "status": "ordered",
+      "confidence": 1.0,
+      "source_quote": "CT abdomen and pelvis ordered.",
+      "source_start_char": 640,
+      "source_end_char": 670,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    },
+    {
+      "type": "order",
+      "name": "IV fluids",
+      "status": "ordered",
+      "confidence": 1.0,
+      "source_quote": "IV fluids ordered.",
+      "source_start_char": 671,
+      "source_end_char": 689,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    },
+    {
+      "type": "medication",
+      "name": "ondansetron",
+      "status": "administered",
+      "confidence": 1.0,
+      "source_quote": "Ondansetron 4 mg IV given.",
+      "source_start_char": 690,
+      "source_end_char": 716,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    }
+  ]
+}

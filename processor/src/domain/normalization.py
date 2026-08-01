@@ -32,6 +32,7 @@ _STATUS_VALUES: frozenset[str] = frozenset(
         "ordered",
         "referred",
         "pending",
+        "present",
         "administered",
         "started",
         "stopped",

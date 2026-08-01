@@ -20,6 +20,7 @@ EXPECTED_STABLE_STATUSES = {
     "ordered",
     "referred",
     "pending",
+    "present",
     "administered",
     "started",
     "stopped",
@@ -126,7 +127,7 @@ class NormalizationTests(unittest.TestCase):
                     normalize_status(raw_status)
 
     def test_exact_statuses_normalize_correctly(self) -> None:
-        self.assertEqual(21, len(EXPECTED_STABLE_STATUSES))
+        self.assertEqual(22, len(EXPECTED_STABLE_STATUSES))
 
         for status in sorted(EXPECTED_STABLE_STATUSES):
             with self.subTest(status=status):
@@ -175,6 +176,7 @@ class NormalizationTests(unittest.TestCase):
             "referred": "referred",
             "discontinued": "discontinued",
             "held": "held",
+            "present": "present",
             "rule out": "rule_out",
             "No Known": "none_known",
         }
