@@ -17,10 +17,15 @@ if str(ROOT) not in sys.path:
 
 from processor.src.domain.evaluation import (  # noqa: E402
     EvaluationError,
+    ExpectedClinicalItem,
     EvaluationResult,
+    InvalidExtractionTrap,
     evaluate_predictions,
+    expected_items_from_json,
+    invalid_traps_from_json,
     predicted_items_from_json,
 )
+from processor.src.domain.extraction_schema import ExtractedClinicalItem  # noqa: E402
 
 
 PREDICTION_SUFFIX = ".predicted.json"
@@ -52,6 +57,17 @@ class AggregateSummary:
                 self.source_quote_failure_count + result.source_quote_failure_count
             ),
         )
+
+
+@dataclass(frozen=True)
+class DocumentEvaluation:
+    """Evaluation result plus parsed item context for diagnostics."""
+
+    document_id: str
+    result: EvaluationResult
+    expected_items: tuple[ExpectedClinicalItem, ...]
+    predicted_items: tuple[ExtractedClinicalItem, ...]
+    invalid_traps: tuple[InvalidExtractionTrap, ...]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -126,7 +142,7 @@ def evaluate_prediction_files(
     prediction_paths: Iterable[Path],
     notes_dir: Path,
     expected_dir: Path,
-) -> tuple[tuple[str, EvaluationResult], ...]:
+) -> tuple[DocumentEvaluation, ...]:
     results = []
     for prediction_path in prediction_paths:
         document_id = document_id_from_prediction_path(prediction_path)
@@ -138,12 +154,22 @@ def evaluate_prediction_files(
         prediction_json = read_json_file(prediction_path, "prediction")
 
         try:
+            expected_items = expected_items_from_json(expected_json)
+            invalid_traps = invalid_traps_from_json(expected_json)
             predicted_items = predicted_items_from_json(prediction_json)
             result = evaluate_predictions(raw_text, expected_json, predicted_items)
         except EvaluationError as exc:
             raise CliError(f"{document_id}: evaluation failed: {exc}") from exc
 
-        results.append((document_id, result))
+        results.append(
+            DocumentEvaluation(
+                document_id=document_id,
+                result=result,
+                expected_items=expected_items,
+                predicted_items=predicted_items,
+                invalid_traps=invalid_traps,
+            )
+        )
 
     if not results:
         raise CliError("no prediction files were evaluated")
@@ -184,11 +210,11 @@ def read_json_file(path: Path, label: str) -> dict:
     return value
 
 
-def print_results(results: tuple[tuple[str, EvaluationResult], ...], output: TextIO) -> None:
+def print_results(results: tuple[DocumentEvaluation, ...], output: TextIO) -> None:
     aggregate = AggregateSummary()
-    for document_id, result in results:
-        print_note_result(document_id, result, output)
-        aggregate = aggregate.add(result)
+    for document_evaluation in results:
+        print_note_result(document_evaluation, output)
+        aggregate = aggregate.add(document_evaluation.result)
 
     print("Aggregate Summary", file=output)
     print(f"  notes_evaluated: {aggregate.notes_evaluated}", file=output)
@@ -204,7 +230,9 @@ def print_results(results: tuple[tuple[str, EvaluationResult], ...], output: Tex
     )
 
 
-def print_note_result(document_id: str, result: EvaluationResult, output: TextIO) -> None:
+def print_note_result(document_evaluation: DocumentEvaluation, output: TextIO) -> None:
+    document_id = document_evaluation.document_id
+    result = document_evaluation.result
     print(f"Document: {document_id}", file=output)
     print(f"  expected_item_count: {result.expected_item_count}", file=output)
     print(f"  predicted_item_count: {result.predicted_item_count}", file=output)
@@ -213,7 +241,85 @@ def print_note_result(document_id: str, result: EvaluationResult, output: TextIO
     print(f"  extra_item_count: {result.extra_item_count}", file=output)
     print(f"  invalid_trap_hit_count: {result.invalid_trap_hit_count}", file=output)
     print(f"  source_quote_failure_count: {result.source_quote_failure_count}", file=output)
+    print_issue_details(document_evaluation, output)
     print("", file=output)
+
+
+def print_issue_details(document_evaluation: DocumentEvaluation, output: TextIO) -> None:
+    result = document_evaluation.result
+    print_item_block(
+        "Missing Expected Items:",
+        "expected_index",
+        result.missing_expected_indexes,
+        document_evaluation.expected_items,
+        output,
+    )
+    print_item_block(
+        "Extra Predicted Items:",
+        "predicted_index",
+        result.extra_predicted_indexes,
+        document_evaluation.predicted_items,
+        output,
+    )
+    print_issue_block("Invalid Trap Hits:", result.invalid_trap_hits, output)
+    print_issue_block("Source Quote Failures:", result.source_quote_failures, output)
+
+
+def print_item_block(
+    title: str,
+    label: str,
+    indexes: tuple[int, ...],
+    items: tuple,
+    output: TextIO,
+) -> None:
+    if not indexes:
+        return
+
+    print(f"  {title}", file=output)
+    for index in indexes:
+        print(f"    {label}: {index}, {item_summary(item_at_index(items, index))}", file=output)
+
+
+def item_at_index(items: tuple, index: int) -> object | None:
+    if index < 0 or index >= len(items):
+        return None
+    return items[index]
+
+
+def item_summary(item: object | None) -> str:
+    if item is None:
+        return "type: <unavailable>, name: <unavailable>, status: <unavailable>"
+
+    item_type = getattr(item, "item_type", "<unavailable>")
+    if hasattr(item_type, "value"):
+        item_type = item_type.value
+
+    name = getattr(item, "name", "<unavailable>")
+    status = getattr(item, "status", None)
+    return f"type: {item_type}, name: {name}, status: {status}"
+
+
+def print_issue_block(title: str, issues: tuple, output: TextIO) -> None:
+    if not issues:
+        return
+
+    print(f"  {title}", file=output)
+    for issue in issues:
+        if title == "Invalid Trap Hits:":
+            print(
+                "    "
+                f"trap_index: {issue.trap_index}, "
+                f"predicted_index: {issue.predicted_index}, "
+                f"message: {issue.message}",
+                file=output,
+            )
+        else:
+            print(
+                "    "
+                f"predicted_index: {issue.predicted_index}, "
+                f"message: {issue.message}",
+                file=output,
+            )
 
 
 class CliError(ValueError):
