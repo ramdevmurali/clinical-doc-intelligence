@@ -57,6 +57,28 @@
       "source_end_char": 431,
       "section_id": "note_005:section:003",
       "section_name": "Procedures"
+    },
+    {
+      "type": "order",
+      "name": "outpatient colonoscopy",
+      "status": "referred",
+      "confidence": 0.85,
+      "source_quote": "Patient referred for outpatient colonoscopy.",
+      "source_start_char": 455,
+      "source_end_char": 499,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
+    },
+    {
+      "type": "order",
+      "name": "iron studies",
+      "status": "ordered",
+      "confidence": 0.85,
+      "source_quote": "Iron studies ordered.",
+      "source_start_char": 500,
+      "source_end_char": 521,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
     }
   ]
 }

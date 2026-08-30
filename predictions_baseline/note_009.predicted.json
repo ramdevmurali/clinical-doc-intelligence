@@ -122,6 +122,39 @@
       "section_name": "Labs"
     },
     {
+      "type": "order",
+      "name": "urine albumin",
+      "status": "ordered",
+      "confidence": 0.85,
+      "source_quote": "Order urine albumin and lipid panel.",
+      "source_start_char": 808,
+      "source_end_char": 844,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "order",
+      "name": "lipid panel",
+      "status": "ordered",
+      "confidence": 0.85,
+      "source_quote": "Order urine albumin and lipid panel.",
+      "source_start_char": 808,
+      "source_end_char": 844,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
+      "type": "order",
+      "name": "diabetic eye exam",
+      "status": "referred",
+      "confidence": 0.85,
+      "source_quote": "Refer for diabetic eye exam.",
+      "source_start_char": 845,
+      "source_end_char": 873,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
       "type": "condition",
       "name": "diabetes above goal",
       "status": "active",

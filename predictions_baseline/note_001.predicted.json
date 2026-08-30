@@ -143,6 +143,17 @@
       "source_end_char": 862,
       "section_id": "note_001:section:008",
       "section_name": "Procedures"
+    },
+    {
+      "type": "order",
+      "name": "primary care follow-up",
+      "status": "planned",
+      "confidence": 0.85,
+      "source_quote": "Follow up with primary care in one week.",
+      "source_start_char": 960,
+      "source_end_char": 1000,
+      "section_id": "note_001:section:009",
+      "section_name": "Assessment and Plan"
     }
   ]
 }

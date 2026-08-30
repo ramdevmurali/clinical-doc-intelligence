@@ -79,6 +79,28 @@
       "section_name": "Labs"
     },
     {
+      "type": "order",
+      "name": "ct abdomen and pelvis",
+      "status": "ordered",
+      "confidence": 0.85,
+      "source_quote": "CT abdomen and pelvis ordered.",
+      "source_start_char": 640,
+      "source_end_char": 670,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    },
+    {
+      "type": "order",
+      "name": "iv fluids",
+      "status": "ordered",
+      "confidence": 0.85,
+      "source_quote": "IV fluids ordered.",
+      "source_start_char": 671,
+      "source_end_char": 689,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    },
+    {
       "type": "condition",
       "name": "abdominal pain with leukocytosis",
       "status": "active",

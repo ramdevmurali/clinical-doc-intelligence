@@ -58,6 +58,14 @@ _PROCEDURE_SECTIONS = {
 }
 _LAB_SECTIONS = {"Labs"}
 _FAMILY_SECTIONS = {"Family History"}
+_ORDER_SECTIONS = {
+    "Assessment",
+    "Assessment and Plan",
+    "Discharge Instructions",
+    "Orders",
+    "Orders and Referrals",
+    "Pending Orders",
+}
 _LAB_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("white blood cell count", re.compile(r"\bWhite blood cell count\s+.+?\.(?=\s|$)")),
     ("creatinine", re.compile(r"\bCreatinine\s+.+?\.(?=\s|$)")),
@@ -68,6 +76,65 @@ _LAB_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("estimated gfr", re.compile(r"\bEstimated GFR\s+.+?\.(?=\s|$)")),
     ("hemoglobin a1c", re.compile(r"\bHemoglobin A1c\s+.+?\.(?=\s|$)")),
     ("ldl cholesterol", re.compile(r"\bLDL cholesterol\s+.+?\.(?=\s|$)")),
+)
+_ORDER_PATTERNS: tuple[tuple[str, str, re.Pattern[str]], ...] = (
+    (
+        "ct abdomen and pelvis",
+        "ordered",
+        re.compile(r"\bCT abdomen and pelvis ordered\.(?=\s|$)", re.IGNORECASE),
+    ),
+    ("iv fluids", "ordered", re.compile(r"\bIV fluids ordered\.(?=\s|$)", re.IGNORECASE)),
+    (
+        "primary care follow-up",
+        "planned",
+        re.compile(r"\bFollow up with primary care\b[^.]*\.(?=\s|$)", re.IGNORECASE),
+    ),
+    ("cbc", "planned", re.compile(r"\bRecheck CBC\b[^.]*\.(?=\s|$)", re.IGNORECASE)),
+    (
+        "outpatient colonoscopy",
+        "referred",
+        re.compile(r"\bPatient referred for outpatient colonoscopy\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "iron studies",
+        "ordered",
+        re.compile(r"\bIron studies ordered\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "basic metabolic panel",
+        "planned",
+        re.compile(r"\bRepeat basic metabolic panel\b[^.]*\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "repeat chest x-ray",
+        "planned",
+        re.compile(r"\bRepeat chest x-ray\b[^.]*\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "urine albumin",
+        "ordered",
+        re.compile(r"\bOrder urine albumin and lipid panel\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "lipid panel",
+        "ordered",
+        re.compile(r"\bOrder urine albumin and lipid panel\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "diabetic eye exam",
+        "referred",
+        re.compile(r"\bRefer for diabetic eye exam\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "surgery clinic follow-up",
+        "planned",
+        re.compile(r"\bFollow up with surgery clinic\b[^.]*\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "pathology report",
+        "pending",
+        re.compile(r"\bPathology report pending\.(?=\s|$)", re.IGNORECASE),
+    ),
 )
 _CONDITION_ACTION_PREFIXES = (
     "await ",
@@ -118,6 +185,7 @@ def extract_baseline_items(raw_text: str, document_id: str) -> tuple[ExtractedCl
     items: list[ExtractedClinicalItem] = []
     for section in sections:
         items.extend(_extract_lab_items(raw_text, section))
+        items.extend(_extract_order_items(raw_text, section))
         for sentence, start_char, end_char in _iter_sentence_spans(section):
             items.extend(
                 _extract_sentence_items(raw_text, section, sentence, start_char, end_char)
@@ -153,6 +221,38 @@ def _extract_lab_items(
             end_char,
         )
         for start_char, end_char, lab_name, source_quote in sorted(lab_spans)
+    )
+
+
+def _extract_order_items(
+    raw_text: str,
+    section: DocumentSection,
+) -> tuple[ExtractedClinicalItem, ...]:
+    if section.name not in _ORDER_SECTIONS:
+        return ()
+
+    order_spans: list[tuple[int, int, int, str, str, str]] = []
+    for pattern_index, (order_name, status, pattern) in enumerate(_ORDER_PATTERNS):
+        for match in pattern.finditer(section.text):
+            start_char = section.start_char + match.start()
+            end_char = section.start_char + match.end()
+            order_spans.append(
+                (start_char, end_char, pattern_index, order_name, status, match.group(0))
+            )
+
+    return tuple(
+        _make_item(
+            raw_text,
+            section,
+            ClinicalItemType.ORDER,
+            order_name,
+            status,
+            0.85,
+            source_quote,
+            start_char,
+            end_char,
+        )
+        for start_char, end_char, _, order_name, status, source_quote in sorted(order_spans)
     )
 
 

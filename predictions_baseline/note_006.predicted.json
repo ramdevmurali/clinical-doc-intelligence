@@ -142,6 +142,17 @@
       "section_name": "Imaging"
     },
     {
+      "type": "order",
+      "name": "basic metabolic panel",
+      "status": "planned",
+      "confidence": 0.85,
+      "source_quote": "Repeat basic metabolic panel in two weeks.",
+      "source_start_char": 704,
+      "source_end_char": 746,
+      "section_id": "note_006:section:008",
+      "section_name": "Assessment and Plan"
+    },
+    {
       "type": "condition",
       "name": "hypertension",
       "status": "active",

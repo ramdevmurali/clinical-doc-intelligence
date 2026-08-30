@@ -68,6 +68,17 @@
       "source_end_char": 710,
       "section_id": "note_004:section:005",
       "section_name": "Labs"
+    },
+    {
+      "type": "order",
+      "name": "cbc",
+      "status": "planned",
+      "confidence": 0.85,
+      "source_quote": "Recheck CBC in one week.",
+      "source_start_char": 775,
+      "source_end_char": 799,
+      "section_id": "note_004:section:006",
+      "section_name": "Assessment"
     }
   ]
 }

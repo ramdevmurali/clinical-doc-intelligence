@@ -68,6 +68,17 @@
       "source_end_char": 545,
       "section_id": "note_008:section:005",
       "section_name": "Imaging"
+    },
+    {
+      "type": "order",
+      "name": "repeat chest x-ray",
+      "status": "planned",
+      "confidence": 0.85,
+      "source_quote": "Repeat chest x-ray in six weeks.",
+      "source_start_char": 555,
+      "source_end_char": 587,
+      "section_id": "note_008:section:006",
+      "section_name": "Orders"
     }
   ]
 }

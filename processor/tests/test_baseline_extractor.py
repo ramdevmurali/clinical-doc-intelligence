@@ -122,6 +122,103 @@ class BaselineExtractorTests(unittest.TestCase):
 
         self.assertFalse(any(item.item_type == ClinicalItemType.LAB_RESULT for item in items))
 
+    def test_extracts_ordered_imaging_order(self) -> None:
+        raw_text = "Orders:\nCT abdomen and pelvis ordered.\n"
+
+        items = extract_baseline_items(raw_text, "ordered_imaging")
+
+        self.assert_order(items[0], "ct abdomen and pelvis", "ordered")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_ordered_support_order(self) -> None:
+        raw_text = "Orders:\nIV fluids ordered.\n"
+
+        items = extract_baseline_items(raw_text, "ordered_support")
+
+        self.assert_order(items[0], "iv fluids", "ordered")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_planned_primary_care_follow_up(self) -> None:
+        raw_text = "Assessment and Plan:\nFollow up with primary care in one week.\n"
+
+        items = extract_baseline_items(raw_text, "primary_care_follow_up")
+
+        self.assert_order(items[0], "primary care follow-up", "planned")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_referred_outpatient_colonoscopy(self) -> None:
+        raw_text = "Orders and Referrals:\nPatient referred for outpatient colonoscopy.\n"
+
+        items = extract_baseline_items(raw_text, "outpatient_colonoscopy")
+
+        self.assert_order(items[0], "outpatient colonoscopy", "referred")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_planned_repeat_imaging(self) -> None:
+        raw_text = "Orders:\nRepeat chest x-ray in six weeks.\n"
+
+        items = extract_baseline_items(raw_text, "repeat_imaging")
+
+        self.assert_order(items[0], "repeat chest x-ray", "planned")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_pending_pathology_report(self) -> None:
+        raw_text = "Pending Orders:\nPathology report pending.\n"
+
+        items = extract_baseline_items(raw_text, "pending_pathology")
+
+        self.assert_order(items[0], "pathology report", "pending")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_planned_basic_metabolic_panel(self) -> None:
+        raw_text = "Assessment and Plan:\nRepeat basic metabolic panel in two weeks.\n"
+
+        items = extract_baseline_items(raw_text, "basic_metabolic_panel")
+
+        self.assert_order(items[0], "basic metabolic panel", "planned")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_two_orders_from_shared_source_quote(self) -> None:
+        raw_text = "Assessment and Plan:\nOrder urine albumin and lipid panel.\n"
+
+        items = extract_baseline_items(raw_text, "shared_order_quote")
+
+        self.assertEqual(
+            [
+                (ClinicalItemType.ORDER, "urine albumin", "ordered"),
+                (ClinicalItemType.ORDER, "lipid panel", "ordered"),
+            ],
+            [(item.item_type, item.name, item.status) for item in items],
+        )
+        self.assertEqual(
+            ["Order urine albumin and lipid panel."] * 2,
+            [item.source_quote for item in items],
+        )
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_diabetic_eye_exam_referral(self) -> None:
+        raw_text = "Assessment and Plan:\nRefer for diabetic eye exam.\n"
+
+        items = extract_baseline_items(raw_text, "eye_exam_referral")
+
+        self.assert_order(items[0], "diabetic eye exam", "referred")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_surgery_clinic_follow_up(self) -> None:
+        raw_text = "Discharge Instructions:\nFollow up with surgery clinic in 10 days.\n"
+
+        items = extract_baseline_items(raw_text, "surgery_follow_up")
+
+        self.assert_order(items[0], "surgery clinic follow-up", "planned")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_does_not_extract_vague_await_text_as_order(self) -> None:
+        raw_text = "Assessment and Plan:\nAwait CT results before surgical consultation.\n"
+
+        items = extract_baseline_items(raw_text, "vague_await")
+
+        self.assertFalse(any(item.item_type == ClinicalItemType.ORDER for item in items))
+
     def test_extracts_performed_procedure_from_surgical_history(self) -> None:
         raw_text = "Past Surgical History:\nAppendectomy in 2018.\n"
 
@@ -389,6 +486,11 @@ class BaselineExtractorTests(unittest.TestCase):
                     item.source_quote,
                     raw_text[item.source_start_char : item.source_end_char],
                 )
+
+    def assert_order(self, item, name: str, status: str) -> None:
+        self.assertEqual(ClinicalItemType.ORDER, item.item_type)
+        self.assertEqual(name, item.name)
+        self.assertEqual(status, item.status)
 
 
 if __name__ == "__main__":

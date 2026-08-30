@@ -91,6 +91,28 @@
       "source_end_char": 578,
       "section_id": "note_010:section:004",
       "section_name": "Medications"
+    },
+    {
+      "type": "order",
+      "name": "surgery clinic follow-up",
+      "status": "planned",
+      "confidence": 0.85,
+      "source_quote": "Follow up with surgery clinic in 10 days.",
+      "source_start_char": 716,
+      "source_end_char": 757,
+      "section_id": "note_010:section:006",
+      "section_name": "Discharge Instructions"
+    },
+    {
+      "type": "order",
+      "name": "pathology report",
+      "status": "pending",
+      "confidence": 0.85,
+      "source_quote": "Pathology report pending.",
+      "source_start_char": 856,
+      "source_end_char": 881,
+      "section_id": "note_010:section:007",
+      "section_name": "Pending Orders"
     }
   ]
 }
