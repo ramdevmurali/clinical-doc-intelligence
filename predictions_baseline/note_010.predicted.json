@@ -7,17 +7,6 @@
   },
   "items": [
     {
-      "type": "condition",
-      "name": "patient tolerated the procedure well",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Patient tolerated the procedure well.",
-      "source_start_char": 198,
-      "source_end_char": 235,
-      "section_id": "note_010:section:002",
-      "section_name": "Hospital Course"
-    },
-    {
       "type": "negative_finding",
       "name": "bile leak",
       "confidence": 0.8,

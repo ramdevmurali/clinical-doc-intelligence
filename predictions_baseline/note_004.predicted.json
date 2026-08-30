@@ -48,39 +48,6 @@
       "source_end_char": 663,
       "section_id": "note_004:section:004",
       "section_name": "Past Medical History"
-    },
-    {
-      "type": "condition",
-      "name": "medication reconciliation completed",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Medication reconciliation completed.",
-      "source_start_char": 724,
-      "source_end_char": 760,
-      "section_id": "note_004:section:006",
-      "section_name": "Assessment"
-    },
-    {
-      "type": "condition",
-      "name": "avoid nsaids",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Avoid NSAIDs.",
-      "source_start_char": 761,
-      "source_end_char": 774,
-      "section_id": "note_004:section:006",
-      "section_name": "Assessment"
-    },
-    {
-      "type": "condition",
-      "name": "recheck cbc in one week",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Recheck CBC in one week.",
-      "source_start_char": 775,
-      "source_end_char": 799,
-      "section_id": "note_004:section:006",
-      "section_name": "Assessment"
     }
   ]
 }

@@ -69,39 +69,6 @@
       "source_end_char": 535,
       "section_id": "note_007:section:004",
       "section_name": "Medications"
-    },
-    {
-      "type": "condition",
-      "name": "amoxicillin allergy with hives",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Amoxicillin allergy with hives.",
-      "source_start_char": 558,
-      "source_end_char": 589,
-      "section_id": "note_007:section:005",
-      "section_name": "Assessment and Plan"
-    },
-    {
-      "type": "condition",
-      "name": "shellfish allergy with throat itching",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Shellfish allergy with throat itching.",
-      "source_start_char": 590,
-      "source_end_char": 628,
-      "section_id": "note_007:section:005",
-      "section_name": "Assessment and Plan"
-    },
-    {
-      "type": "condition",
-      "name": "remove iodine allergy from chart",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Remove iodine allergy from chart.",
-      "source_start_char": 629,
-      "source_end_char": 662,
-      "section_id": "note_007:section:005",
-      "section_name": "Assessment and Plan"
     }
   ]
 }

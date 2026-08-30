@@ -122,17 +122,6 @@
       "source_end_char": 903,
       "section_id": "note_003:section:009",
       "section_name": "Assessment and Plan"
-    },
-    {
-      "type": "condition",
-      "name": "replete potassium",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Replete potassium.",
-      "source_start_char": 926,
-      "source_end_char": 944,
-      "section_id": "note_003:section:009",
-      "section_name": "Assessment and Plan"
     }
   ]
 }

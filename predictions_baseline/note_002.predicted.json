@@ -68,17 +68,6 @@
       "source_end_char": 772,
       "section_id": "note_002:section:009",
       "section_name": "Assessment and Plan"
-    },
-    {
-      "type": "condition",
-      "name": "await ct results before surgical consultation",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Await CT results before surgical consultation.",
-      "source_start_char": 773,
-      "source_end_char": 819,
-      "section_id": "note_002:section:009",
-      "section_name": "Assessment and Plan"
     }
   ]
 }

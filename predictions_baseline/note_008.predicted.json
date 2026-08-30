@@ -68,39 +68,6 @@
       "source_end_char": 545,
       "section_id": "note_008:section:005",
       "section_name": "Imaging"
-    },
-    {
-      "type": "condition",
-      "name": "possible early pneumonia",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Possible early pneumonia.",
-      "source_start_char": 666,
-      "source_end_char": 691,
-      "section_id": "note_008:section:007",
-      "section_name": "Assessment"
-    },
-    {
-      "type": "condition",
-      "name": "atelectasis also possible",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Atelectasis also possible.",
-      "source_start_char": 692,
-      "source_end_char": 718,
-      "section_id": "note_008:section:007",
-      "section_name": "Assessment"
-    },
-    {
-      "type": "condition",
-      "name": "low suspicion for malignancy",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Low suspicion for malignancy.",
-      "source_start_char": 719,
-      "source_end_char": 748,
-      "section_id": "note_008:section:007",
-      "section_name": "Assessment"
     }
   ]
 }

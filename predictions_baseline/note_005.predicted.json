@@ -57,17 +57,6 @@
       "source_end_char": 431,
       "section_id": "note_005:section:003",
       "section_name": "Procedures"
-    },
-    {
-      "type": "condition",
-      "name": "rectal bleeding likely from hemorrhoids, but colonoscopy is needed to evaluate positive fit",
-      "status": "active",
-      "confidence": 0.6,
-      "source_quote": "Rectal bleeding likely from hemorrhoids, but colonoscopy is needed to evaluate positive FIT.",
-      "source_start_char": 581,
-      "source_end_char": 673,
-      "section_id": "note_005:section:005",
-      "section_name": "Assessment"
     }
   ]
 }

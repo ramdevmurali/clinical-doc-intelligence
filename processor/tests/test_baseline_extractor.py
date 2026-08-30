@@ -216,6 +216,62 @@ class BaselineExtractorTests(unittest.TestCase):
             )
         )
 
+    def test_does_not_extract_plan_action_sentences_as_conditions(self) -> None:
+        raw_text = (
+            "Assessment and Plan:\n"
+            "Await CT results before surgical consultation.\n"
+            "Replete potassium.\n"
+            "Recheck CBC in one week.\n"
+            "Avoid NSAIDs.\n"
+            "Remove iodine allergy from chart.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "plan_actions")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.CONDITION for item in items)
+        )
+
+    def test_does_not_extract_uncertain_mentions_as_active_conditions(self) -> None:
+        raw_text = (
+            "Assessment:\n"
+            "CT chest suggests possible early pneumonia versus atelectasis.\n"
+            "Atelectasis also possible.\n"
+            "Low suspicion for malignancy.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "uncertain_mentions")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.CONDITION for item in items)
+        )
+
+    def test_does_not_extract_allergy_statements_as_conditions(self) -> None:
+        raw_text = (
+            "Assessment:\n"
+            "Amoxicillin allergy with hives.\n"
+            "Shellfish allergy with throat itching.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "allergy_statements")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.CONDITION for item in items)
+        )
+
+    def test_does_not_extract_admin_or_normal_course_text_as_conditions(self) -> None:
+        raw_text = (
+            "Hospital Course:\n"
+            "Medication reconciliation completed.\n"
+            "Patient tolerated the procedure well.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "admin_normal_course")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.CONDITION for item in items)
+        )
+
     def test_every_extracted_item_has_exact_source_span(self) -> None:
         raw_text = (
             "Past Medical History:\nHypertension.\n\n"

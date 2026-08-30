@@ -58,10 +58,15 @@ _PROCEDURE_SECTIONS = {
 }
 _FAMILY_SECTIONS = {"Family History"}
 _CONDITION_ACTION_PREFIXES = (
+    "await ",
+    "avoid ",
     "continue ",
     "follow up",
     "monitor ",
     "repeat ",
+    "recheck ",
+    "remove ",
+    "replete ",
     "start ",
     "increase ",
     "order ",
@@ -69,6 +74,18 @@ _CONDITION_ACTION_PREFIXES = (
     "return ",
     "do not ",
     "keep ",
+)
+_CONDITION_EXCLUSION_PHRASES = (
+    "allergy",
+    "also possible",
+    "low suspicion",
+    "medication reconciliation completed",
+    "needed to evaluate",
+    "not fully excluded",
+    "possible ",
+    "suggests possible",
+    "tolerated the procedure well",
+    "versus ",
 )
 _NON_PROCEDURE_PREFIXES = ("no ", "patient referred", "refer ", "referral ", "ordered ", "order ")
 
@@ -360,6 +377,8 @@ def _name_fragments(text: str) -> tuple[str, ...]:
 
 def _looks_like_condition_sentence(lower_sentence: str) -> bool:
     if lower_sentence.startswith(_CONDITION_ACTION_PREFIXES):
+        return False
+    if any(phrase in lower_sentence for phrase in _CONDITION_EXCLUSION_PHRASES):
         return False
     if any(phrase in lower_sentence for phrase, _ in _NEGATION_PATTERNS):
         return False
