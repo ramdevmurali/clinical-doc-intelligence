@@ -60,6 +60,16 @@
       "section_name": "Medications"
     },
     {
+      "type": "negative_finding",
+      "name": "pulmonary embolism",
+      "confidence": 0.8,
+      "source_quote": "No pulmonary embolism.",
+      "source_start_char": 523,
+      "source_end_char": 545,
+      "section_id": "note_008:section:005",
+      "section_name": "Imaging"
+    },
+    {
       "type": "condition",
       "name": "possible early pneumonia",
       "status": "active",

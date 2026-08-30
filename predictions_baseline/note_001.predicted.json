@@ -18,6 +18,16 @@
     },
     {
       "type": "negative_finding",
+      "name": "shortness of breath",
+      "confidence": 0.8,
+      "source_quote": "Patient denies chest pain and denies shortness of breath.",
+      "source_start_char": 329,
+      "source_end_char": 386,
+      "section_id": "note_001:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
       "name": "diabetic ketoacidosis",
       "confidence": 0.8,
       "source_quote": "No evidence of diabetic ketoacidosis was found during admission.",

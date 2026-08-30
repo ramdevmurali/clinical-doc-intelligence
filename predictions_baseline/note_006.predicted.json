@@ -17,6 +17,26 @@
       "section_name": "History of Present Illness"
     },
     {
+      "type": "negative_finding",
+      "name": "syncope",
+      "confidence": 0.8,
+      "source_quote": "Denies dizziness, syncope, and leg swelling.",
+      "source_start_char": 183,
+      "source_end_char": 227,
+      "section_id": "note_006:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "leg swelling",
+      "confidence": 0.8,
+      "source_quote": "Denies dizziness, syncope, and leg swelling.",
+      "source_start_char": 183,
+      "source_end_char": 227,
+      "section_id": "note_006:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
       "type": "condition",
       "name": "chronic kidney disease stage 3b",
       "status": "active",
@@ -70,6 +90,16 @@
       "source_end_char": 365,
       "section_id": "note_006:section:004",
       "section_name": "Medications"
+    },
+    {
+      "type": "negative_finding",
+      "name": "hydronephrosis",
+      "confidence": 0.8,
+      "source_quote": "Renal ultrasound shows no hydronephrosis.",
+      "source_start_char": 578,
+      "source_end_char": 619,
+      "section_id": "note_006:section:007",
+      "section_name": "Imaging"
     },
     {
       "type": "condition",

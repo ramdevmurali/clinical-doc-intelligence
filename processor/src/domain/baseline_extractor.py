@@ -89,94 +89,105 @@ def extract_baseline_items(raw_text: str, document_id: str) -> tuple[ExtractedCl
     items: list[ExtractedClinicalItem] = []
     for section in sections:
         for sentence, start_char, end_char in _iter_sentence_spans(section):
-            item = _extract_sentence_item(raw_text, section, sentence, start_char, end_char)
-            if item is not None:
-                items.append(item)
+            items.extend(
+                _extract_sentence_items(raw_text, section, sentence, start_char, end_char)
+            )
 
     return tuple(items)
 
 
-def _extract_sentence_item(
+def _extract_sentence_items(
     raw_text: str,
     section: DocumentSection,
     sentence: str,
     start_char: int,
     end_char: int,
-) -> ExtractedClinicalItem | None:
+) -> tuple[ExtractedClinicalItem, ...]:
     lower_sentence = sentence.lower()
 
-    negative_name = _negative_finding_name(sentence)
-    if negative_name:
-        return _make_item(
-            raw_text,
-            section,
-            ClinicalItemType.NEGATIVE_FINDING,
-            negative_name,
-            None,
-            0.80,
-            sentence,
-            start_char,
-            end_char,
-        )
-
-    family_name = _family_history_name(sentence)
-    if section.name in _FAMILY_SECTIONS or family_name:
-        if family_name:
-            return _make_item(
+    negative_names = _negative_finding_names(sentence)
+    if negative_names:
+        return tuple(
+            _make_item(
                 raw_text,
                 section,
-                ClinicalItemType.FAMILY_HISTORY,
-                family_name,
+                ClinicalItemType.NEGATIVE_FINDING,
+                negative_name,
                 None,
                 0.80,
                 sentence,
                 start_char,
                 end_char,
             )
-        return None
+            for negative_name in negative_names
+        )
+
+    family_name = _family_history_name(sentence)
+    if section.name in _FAMILY_SECTIONS or family_name:
+        if family_name:
+            return (
+                _make_item(
+                    raw_text,
+                    section,
+                    ClinicalItemType.FAMILY_HISTORY,
+                    family_name,
+                    None,
+                    0.80,
+                    sentence,
+                    start_char,
+                    end_char,
+                ),
+            )
+        return ()
 
     if section.name in _MEDICATION_SECTIONS:
-        return _make_item(
-            raw_text,
-            section,
-            ClinicalItemType.MEDICATION,
-            _medication_name(sentence),
-            _medication_status(lower_sentence),
-            0.80,
-            sentence,
-            start_char,
-            end_char,
+        return (
+            _make_item(
+                raw_text,
+                section,
+                ClinicalItemType.MEDICATION,
+                _medication_name(sentence),
+                _medication_status(lower_sentence),
+                0.80,
+                sentence,
+                start_char,
+                end_char,
+            ),
         )
 
     if section.name in _PROCEDURE_SECTIONS:
         if lower_sentence.startswith(_NON_PROCEDURE_PREFIXES):
-            return None
-        return _make_item(
-            raw_text,
-            section,
-            ClinicalItemType.PROCEDURE,
-            _procedure_name(sentence),
-            _procedure_status(lower_sentence),
-            0.80,
-            sentence,
-            start_char,
-            end_char,
+            return ()
+        return (
+            _make_item(
+                raw_text,
+                section,
+                ClinicalItemType.PROCEDURE,
+                _procedure_name(sentence),
+                _procedure_status(lower_sentence),
+                0.80,
+                sentence,
+                start_char,
+                end_char,
+            ),
         )
 
     if section.name in _CONDITION_SECTIONS and _looks_like_condition_sentence(lower_sentence):
-        return _make_item(
-            raw_text,
-            section,
-            ClinicalItemType.CONDITION,
-            _condition_name(sentence),
-            _condition_status(lower_sentence),
-            0.60,
-            sentence,
-            start_char,
-            end_char,
+        return (
+            _make_item(
+                raw_text,
+                section,
+                ClinicalItemType.CONDITION,
+                _condition_name(sentence),
+                _condition_status(lower_sentence),
+                0.60,
+                sentence,
+                start_char,
+                end_char,
+            ),
         )
 
-    return None
+    return ()
 
 
 def _iter_sentence_spans(section: DocumentSection) -> tuple[tuple[str, int, int], ...]:
@@ -223,12 +234,35 @@ def _make_item(
     )
 
 
-def _negative_finding_name(sentence: str) -> str | None:
+def _negative_finding_names(sentence: str) -> tuple[str, ...]:
+    names: list[str] = []
     for _, pattern in _NEGATION_PATTERNS:
         match = pattern.search(sentence)
         if match:
-            return _first_name_fragment(match.group("name"))
-    return None
+            names.extend(_name_fragments(match.group("name")))
+            break
+
+    if not names:
+        names.extend(_simple_no_negative_names(sentence))
+
+    return tuple(name for name in names if name)
+
+
+def _simple_no_negative_names(sentence: str) -> tuple[str, ...]:
+    if re.search(r"\bno known\b", sentence, re.IGNORECASE):
+        return ()
+    if re.search(r"\bprocedures?\s+were\s+completed\b", sentence, re.IGNORECASE):
+        return ()
+
+    match = re.search(r"^\s*no\s+(?P<name>[^.]+)", sentence, re.IGNORECASE)
+    if match:
+        return (_first_name_fragment(match.group("name")),)
+
+    match = re.search(r"\bshows\s+no\s+(?P<name>[^.]+)", sentence, re.IGNORECASE)
+    if match:
+        return (_first_name_fragment(match.group("name")),)
+
+    return ()
 
 
 def _family_history_name(sentence: str) -> str | None:
@@ -302,13 +336,26 @@ def _condition_name(sentence: str) -> str:
 
 
 def _first_name_fragment(text: str) -> str:
-    text = text.replace(" and denies ", ", ")
-    text = text.replace(" and ", ", ")
-    text = text.replace(" or ", ", ")
-    text = text.split(",")[0]
+    fragments = _name_fragments(text)
+    text = fragments[0] if fragments else text
     text = _TRAILING_NEGATION_VERB_RE.sub("", text)
     text = _TRAILING_CONTEXT_RE.sub("", text)
     return _clean_name(text)
+
+
+def _name_fragments(text: str) -> tuple[str, ...]:
+    text = re.sub(r"\band\s+denies?\b", ",", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bdenies?\b", ",", text, flags=re.IGNORECASE)
+    text = re.sub(r"\band\b", ",", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bor\b", ",", text, flags=re.IGNORECASE)
+    fragments = []
+    for fragment in text.split(","):
+        fragment = _TRAILING_NEGATION_VERB_RE.sub("", fragment)
+        fragment = _TRAILING_CONTEXT_RE.sub("", fragment)
+        fragment = _clean_name(fragment)
+        if fragment:
+            fragments.append(fragment)
+    return tuple(fragments)
 
 
 def _looks_like_condition_sentence(lower_sentence: str) -> bool:

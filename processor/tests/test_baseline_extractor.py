@@ -97,6 +97,88 @@ class BaselineExtractorTests(unittest.TestCase):
         self.assertEqual("chest pain", items[0].name)
         self.assertIsNone(items[0].status)
 
+    def test_extracts_multiple_negative_findings_from_repeated_denies_quote(self) -> None:
+        raw_text = (
+            "History of Present Illness:\n"
+            "The patient denies fever, denies vomiting, and denies dysuria.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "multi_negative")
+
+        self.assertEqual(
+            [
+                (ClinicalItemType.NEGATIVE_FINDING, "fever"),
+                (ClinicalItemType.NEGATIVE_FINDING, "vomiting"),
+                (ClinicalItemType.NEGATIVE_FINDING, "dysuria"),
+            ],
+            [(item.item_type, item.name) for item in items],
+        )
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_multiple_negative_findings_from_denies_list(self) -> None:
+        raw_text = "Review of Systems:\nDenies dizziness, syncope, and leg swelling.\n"
+
+        items = extract_baseline_items(raw_text, "negative_list")
+
+        self.assertEqual(
+            [
+                "dizziness",
+                "syncope",
+                "leg swelling",
+            ],
+            [item.name for item in items],
+        )
+        self.assertTrue(all(item.item_type == ClinicalItemType.NEGATIVE_FINDING for item in items))
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_simple_no_negative_finding(self) -> None:
+        raw_text = "History of Present Illness:\nNo chest pain.\n"
+
+        items = extract_baseline_items(raw_text, "simple_no")
+
+        self.assertEqual(1, len(items))
+        self.assertEqual(ClinicalItemType.NEGATIVE_FINDING, items[0].item_type)
+        self.assertEqual("chest pain", items[0].name)
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_simple_no_negative_finding_uses_first_or_fragment(self) -> None:
+        raw_text = "History of Present Illness:\nNo fever or chills.\n"
+
+        items = extract_baseline_items(raw_text, "simple_no_or")
+
+        self.assertEqual(1, len(items))
+        self.assertEqual(ClinicalItemType.NEGATIVE_FINDING, items[0].item_type)
+        self.assertEqual("fever", items[0].name)
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_imaging_shows_no_negative_finding(self) -> None:
+        raw_text = "Results:\nRenal ultrasound shows no hydronephrosis.\n"
+
+        items = extract_baseline_items(raw_text, "shows_no")
+
+        self.assertEqual(1, len(items))
+        self.assertEqual(ClinicalItemType.NEGATIVE_FINDING, items[0].item_type)
+        self.assertEqual("hydronephrosis", items[0].name)
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_does_not_extract_no_known_allergies_as_negative_finding(self) -> None:
+        raw_text = "Allergies:\nNo known drug allergies.\n"
+
+        items = extract_baseline_items(raw_text, "no_known")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.NEGATIVE_FINDING for item in items)
+        )
+
+    def test_does_not_extract_no_completed_procedures_as_negative_finding(self) -> None:
+        raw_text = "Procedures:\nNo inpatient procedures were completed.\n"
+
+        items = extract_baseline_items(raw_text, "no_procedures_completed")
+
+        self.assertFalse(
+            any(item.item_type == ClinicalItemType.NEGATIVE_FINDING for item in items)
+        )
+
     def test_does_not_extract_denied_symptom_as_active_condition(self) -> None:
         raw_text = "Past Medical History:\nPatient denies chest pain.\n"
 

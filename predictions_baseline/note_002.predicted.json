@@ -17,6 +17,26 @@
       "section_name": "History of Present Illness"
     },
     {
+      "type": "negative_finding",
+      "name": "vomiting",
+      "confidence": 0.8,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "dysuria",
+      "confidence": 0.8,
+      "source_quote": "The patient denies fever, denies vomiting, and denies dysuria.",
+      "source_start_char": 230,
+      "source_end_char": 292,
+      "section_id": "note_002:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
       "type": "condition",
       "name": "asthma, mild intermittent",
       "status": "active",

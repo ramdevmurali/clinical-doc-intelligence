@@ -7,6 +7,26 @@
   },
   "items": [
     {
+      "type": "negative_finding",
+      "name": "chest pain",
+      "confidence": 0.8,
+      "source_quote": "No chest pain.",
+      "source_start_char": 131,
+      "source_end_char": 145,
+      "section_id": "note_003:section:001",
+      "section_name": "Subjective"
+    },
+    {
+      "type": "negative_finding",
+      "name": "fever",
+      "confidence": 0.8,
+      "source_quote": "No fever or chills.",
+      "source_start_char": 146,
+      "source_end_char": 165,
+      "section_id": "note_003:section:001",
+      "section_name": "Subjective"
+    },
+    {
       "type": "condition",
       "name": "congestive heart failure with reduced ejection fraction",
       "status": "active",
@@ -48,6 +68,16 @@
       "source_end_char": 382,
       "section_id": "note_003:section:003",
       "section_name": "Family History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "focal pneumonia",
+      "confidence": 0.8,
+      "source_quote": "No focal pneumonia.",
+      "source_start_char": 696,
+      "source_end_char": 715,
+      "section_id": "note_003:section:007",
+      "section_name": "Imaging"
     },
     {
       "type": "medication",

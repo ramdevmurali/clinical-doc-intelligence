@@ -7,6 +7,26 @@
   },
   "items": [
     {
+      "type": "negative_finding",
+      "name": "polyuria",
+      "confidence": 0.8,
+      "source_quote": "No polyuria.",
+      "source_start_char": 204,
+      "source_end_char": 216,
+      "section_id": "note_009:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
+      "type": "negative_finding",
+      "name": "foot ulcers",
+      "confidence": 0.8,
+      "source_quote": "No foot ulcers.",
+      "source_start_char": 217,
+      "source_end_char": 232,
+      "section_id": "note_009:section:002",
+      "section_name": "History of Present Illness"
+    },
+    {
       "type": "condition",
       "name": "type 2 diabetes mellitus",
       "status": "active",

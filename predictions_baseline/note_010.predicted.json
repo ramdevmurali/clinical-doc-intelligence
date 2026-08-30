@@ -18,10 +18,9 @@
       "section_name": "Hospital Course"
     },
     {
-      "type": "condition",
-      "name": "no bile leak",
-      "status": "active",
-      "confidence": 0.6,
+      "type": "negative_finding",
+      "name": "bile leak",
+      "confidence": 0.8,
       "source_quote": "No bile leak.",
       "source_start_char": 236,
       "source_end_char": 249,
@@ -29,10 +28,9 @@
       "section_name": "Hospital Course"
     },
     {
-      "type": "condition",
-      "name": "no wound infection",
-      "status": "active",
-      "confidence": 0.6,
+      "type": "negative_finding",
+      "name": "wound infection",
+      "confidence": 0.8,
       "source_quote": "No wound infection.",
       "source_start_char": 250,
       "source_end_char": 269,

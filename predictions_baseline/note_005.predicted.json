@@ -7,6 +7,26 @@
   },
   "items": [
     {
+      "type": "negative_finding",
+      "name": "weight loss",
+      "confidence": 0.8,
+      "source_quote": "No weight loss.",
+      "source_start_char": 201,
+      "source_end_char": 216,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
+      "type": "negative_finding",
+      "name": "abdominal pain",
+      "confidence": 0.8,
+      "source_quote": "No abdominal pain.",
+      "source_start_char": 217,
+      "source_end_char": 235,
+      "section_id": "note_005:section:002",
+      "section_name": "History"
+    },
+    {
       "type": "family_history",
       "name": "colon cancer",
       "confidence": 0.8,
