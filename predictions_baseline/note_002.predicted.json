@@ -59,6 +59,26 @@
       "section_name": "Medications"
     },
     {
+      "type": "lab_result",
+      "name": "white blood cell count",
+      "confidence": 0.85,
+      "source_quote": "White blood cell count 13.2 K/uL.",
+      "source_start_char": 575,
+      "source_end_char": 608,
+      "section_id": "note_002:section:007",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "confidence": 0.85,
+      "source_quote": "Creatinine 0.8 mg/dL.",
+      "source_start_char": 609,
+      "source_end_char": 630,
+      "section_id": "note_002:section:007",
+      "section_name": "Labs"
+    },
+    {
       "type": "condition",
       "name": "abdominal pain with leukocytosis",
       "status": "active",

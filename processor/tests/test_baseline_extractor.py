@@ -67,6 +67,61 @@ class BaselineExtractorTests(unittest.TestCase):
             [(item.name, item.status) for item in items],
         )
 
+    def test_extracts_multiple_lab_results_from_labs_section(self) -> None:
+        raw_text = (
+            "Labs:\n"
+            "White blood cell count 13.2 K/uL. Creatinine 0.8 mg/dL.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "labs")
+
+        self.assertEqual(
+            [
+                (ClinicalItemType.LAB_RESULT, "white blood cell count", None),
+                (ClinicalItemType.LAB_RESULT, "creatinine", None),
+            ],
+            [(item.item_type, item.name, item.status) for item in items],
+        )
+        self.assertEqual(
+            [
+                "White blood cell count 13.2 K/uL.",
+                "Creatinine 0.8 mg/dL.",
+            ],
+            [item.source_quote for item in items],
+        )
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_lab_results_with_units_and_internal_decimal(self) -> None:
+        raw_text = (
+            "Labs:\n"
+            "Estimated GFR 34 mL/min/1.73m2. Hemoglobin A1c 5.6 percent.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "decimal_labs")
+
+        self.assertEqual(
+            [
+                (ClinicalItemType.LAB_RESULT, "estimated gfr"),
+                (ClinicalItemType.LAB_RESULT, "hemoglobin a1c"),
+            ],
+            [(item.item_type, item.name) for item in items],
+        )
+        self.assertEqual(
+            [
+                "Estimated GFR 34 mL/min/1.73m2.",
+                "Hemoglobin A1c 5.6 percent.",
+            ],
+            [item.source_quote for item in items],
+        )
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_lab_like_wording_outside_labs_section_is_not_lab_result(self) -> None:
+        raw_text = "Assessment and Plan:\nRecheck CBC in one week.\n"
+
+        items = extract_baseline_items(raw_text, "not_lab")
+
+        self.assertFalse(any(item.item_type == ClinicalItemType.LAB_RESULT for item in items))
+
     def test_extracts_performed_procedure_from_surgical_history(self) -> None:
         raw_text = "Past Surgical History:\nAppendectomy in 2018.\n"
 

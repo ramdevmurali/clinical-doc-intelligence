@@ -70,6 +70,36 @@
       "section_name": "Family History"
     },
     {
+      "type": "lab_result",
+      "name": "potassium",
+      "confidence": 0.85,
+      "source_quote": "Potassium 3.2 mmol/L.",
+      "source_start_char": 578,
+      "source_end_char": 599,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "creatinine",
+      "confidence": 0.85,
+      "source_quote": "Creatinine 1.9 mg/dL.",
+      "source_start_char": 600,
+      "source_end_char": 621,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "bnp",
+      "confidence": 0.85,
+      "source_quote": "BNP 820 pg/mL.",
+      "source_start_char": 622,
+      "source_end_char": 636,
+      "section_id": "note_003:section:006",
+      "section_name": "Labs"
+    },
+    {
       "type": "negative_finding",
       "name": "focal pneumonia",
       "confidence": 0.8,

@@ -92,6 +92,46 @@
       "section_name": "Medications"
     },
     {
+      "type": "lab_result",
+      "name": "creatinine",
+      "confidence": 0.85,
+      "source_quote": "Creatinine 2.1 mg/dL.",
+      "source_start_char": 443,
+      "source_end_char": 464,
+      "section_id": "note_006:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "estimated gfr",
+      "confidence": 0.85,
+      "source_quote": "Estimated GFR 34 mL/min/1.73m2.",
+      "source_start_char": 465,
+      "source_end_char": 496,
+      "section_id": "note_006:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "potassium",
+      "confidence": 0.85,
+      "source_quote": "Potassium 5.4 mmol/L.",
+      "source_start_char": 497,
+      "source_end_char": 518,
+      "section_id": "note_006:section:006",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin a1c",
+      "confidence": 0.85,
+      "source_quote": "Hemoglobin A1c 5.6 percent.",
+      "source_start_char": 540,
+      "source_end_char": 567,
+      "section_id": "note_006:section:006",
+      "section_name": "Labs"
+    },
+    {
       "type": "negative_finding",
       "name": "hydronephrosis",
       "confidence": 0.8,

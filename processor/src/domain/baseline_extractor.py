@@ -56,7 +56,19 @@ _PROCEDURE_SECTIONS = {
     "Past Surgical History",
     "Procedures",
 }
+_LAB_SECTIONS = {"Labs"}
 _FAMILY_SECTIONS = {"Family History"}
+_LAB_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("white blood cell count", re.compile(r"\bWhite blood cell count\s+.+?\.(?=\s|$)")),
+    ("creatinine", re.compile(r"\bCreatinine\s+.+?\.(?=\s|$)")),
+    ("potassium", re.compile(r"\bPotassium\s+.+?\.(?=\s|$)")),
+    ("bnp", re.compile(r"\bBNP\s+.+?\.(?=\s|$)")),
+    ("hemoglobin", re.compile(r"\bHemoglobin(?!\s+A1c)\s+.+?\.(?=\s|$)")),
+    ("sodium", re.compile(r"\bSodium\s+.+?\.(?=\s|$)")),
+    ("estimated gfr", re.compile(r"\bEstimated GFR\s+.+?\.(?=\s|$)")),
+    ("hemoglobin a1c", re.compile(r"\bHemoglobin A1c\s+.+?\.(?=\s|$)")),
+    ("ldl cholesterol", re.compile(r"\bLDL cholesterol\s+.+?\.(?=\s|$)")),
+)
 _CONDITION_ACTION_PREFIXES = (
     "await ",
     "avoid ",
@@ -105,12 +117,43 @@ def extract_baseline_items(raw_text: str, document_id: str) -> tuple[ExtractedCl
 
     items: list[ExtractedClinicalItem] = []
     for section in sections:
+        items.extend(_extract_lab_items(raw_text, section))
         for sentence, start_char, end_char in _iter_sentence_spans(section):
             items.extend(
                 _extract_sentence_items(raw_text, section, sentence, start_char, end_char)
             )
 
     return tuple(items)
+
+
+def _extract_lab_items(
+    raw_text: str,
+    section: DocumentSection,
+) -> tuple[ExtractedClinicalItem, ...]:
+    if section.name not in _LAB_SECTIONS:
+        return ()
+
+    lab_spans: list[tuple[int, int, str, str]] = []
+    for lab_name, pattern in _LAB_PATTERNS:
+        for match in pattern.finditer(section.text):
+            start_char = section.start_char + match.start()
+            end_char = section.start_char + match.end()
+            lab_spans.append((start_char, end_char, lab_name, match.group(0)))
+
+    return tuple(
+        _make_item(
+            raw_text,
+            section,
+            ClinicalItemType.LAB_RESULT,
+            lab_name,
+            None,
+            0.85,
+            source_quote,
+            start_char,
+            end_char,
+        )
+        for start_char, end_char, lab_name, source_quote in sorted(lab_spans)
+    )
 
 
 def _extract_sentence_items(

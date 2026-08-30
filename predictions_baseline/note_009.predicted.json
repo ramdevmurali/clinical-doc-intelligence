@@ -102,6 +102,26 @@
       "section_name": "Medications"
     },
     {
+      "type": "lab_result",
+      "name": "hemoglobin a1c",
+      "confidence": 0.85,
+      "source_quote": "Hemoglobin A1c 7.4 percent.",
+      "source_start_char": 640,
+      "source_end_char": 667,
+      "section_id": "note_009:section:008",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "ldl cholesterol",
+      "confidence": 0.85,
+      "source_quote": "LDL cholesterol 118 mg/dL.",
+      "source_start_char": 668,
+      "source_end_char": 694,
+      "section_id": "note_009:section:008",
+      "section_name": "Labs"
+    },
+    {
       "type": "condition",
       "name": "diabetes above goal",
       "status": "active",

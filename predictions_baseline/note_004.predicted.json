@@ -48,6 +48,26 @@
       "source_end_char": 663,
       "section_id": "note_004:section:004",
       "section_name": "Past Medical History"
+    },
+    {
+      "type": "lab_result",
+      "name": "hemoglobin",
+      "confidence": 0.85,
+      "source_quote": "Hemoglobin 9.8 g/dL.",
+      "source_start_char": 671,
+      "source_end_char": 691,
+      "section_id": "note_004:section:005",
+      "section_name": "Labs"
+    },
+    {
+      "type": "lab_result",
+      "name": "sodium",
+      "confidence": 0.85,
+      "source_quote": "Sodium 129 mmol/L.",
+      "source_start_char": 692,
+      "source_end_char": 710,
+      "section_id": "note_004:section:005",
+      "section_name": "Labs"
     }
   ]
 }
