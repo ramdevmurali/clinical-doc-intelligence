@@ -2,8 +2,9 @@
 
 Clinical Document Intelligence is a source-grounded clinical extraction and
 evaluation project. The current implementation focuses on pure domain logic for
-parsing notes, validating source evidence, applying deterministic clinical
-guardrails, and evaluating extracted clinical items against golden fixtures.
+parsing synthetic clinical notes, validating source evidence, applying
+deterministic clinical guardrails, running a conservative baseline extractor,
+and evaluating predictions against manually controlled golden fixtures.
 
 ## Disclaimer
 
@@ -16,24 +17,30 @@ be used with real patient data.
 Implemented:
 
 - Repository skeleton and documentation structure.
-- Pure domain section parser.
-- Source quote/span validation.
+- Pure domain section parser with exact section offsets.
+- Source quote/span validation utilities.
 - Clinical extraction schema primitives.
 - Deterministic normalization helpers.
 - Validation status and review primitives.
 - Deterministic clinical rule guardrails.
-- Evaluation domain harness.
-- Golden fixture tests for `note_001`.
+- Golden-set evaluation domain logic.
+- Saved prediction JSON parsing.
+- Golden-set evaluator CLI: `scripts/eval_golden.py`.
+- Deterministic baseline extractor: `processor/src/domain/baseline_extractor.py`.
+- Baseline extractor runner: `scripts/run_baseline_extractor.py`.
+- Baseline error reporter: `scripts/report_baseline_errors.py`.
+- Golden fixture set with 10 synthetic notes.
+- Baseline prediction files in `predictions_baseline/`.
 
 Not implemented yet:
 
+- AI/LLM extraction harness.
 - Backend API.
 - Frontend UI.
-- LLM extraction.
 - Kafka/Redpanda workers.
 - Database persistence.
 - FHIR export.
-- CLI golden evaluator.
+- Human review UI/workflow.
 
 ## Current Domain Modules
 
@@ -44,42 +51,80 @@ Not implemented yet:
 - `processor/src/domain/validation.py`: defines validation statuses, severities, findings, and decisions.
 - `processor/src/domain/clinical_rules.py`: applies deterministic clinical safety guardrails.
 - `processor/src/domain/evaluation.py`: evaluates predicted items against golden expected labels.
+- `processor/src/domain/baseline_extractor.py`: produces conservative deterministic baseline predictions.
 
-## Evaluation Status
+## Golden Set and Predictions
 
-The domain evaluator is implemented through `evaluate_predictions(...)`.
-It currently:
+Golden fixtures:
 
-- parses golden expected items;
-- parses invalid extraction traps;
-- matches expected and predicted items deterministically;
-- reports missing expected items;
-- reports extra predicted items;
-- detects invalid trap hits;
-- validates predicted source quote spans;
-- returns an inspectable `EvaluationResult`.
+```text
+golden_set/notes/{document_id}.txt
+golden_set/expected/{document_id}.expected.json
+```
 
-Prediction JSON format is defined in `docs/prediction_format.md`. A CLI runner
-for evaluating saved prediction files is intentionally not implemented yet.
+Saved baseline predictions:
+
+```text
+predictions_baseline/{document_id}.predicted.json
+```
+
+Prediction JSON format is defined in `docs/prediction_format.md`.
+
+## Evaluation and Baseline Commands
+
+Run the deterministic baseline extractor:
+
+```bash
+python3 scripts/run_baseline_extractor.py --overwrite
+```
+
+Evaluate saved predictions:
+
+```bash
+python3 scripts/eval_golden.py --predictions-dir predictions_baseline
+```
+
+Summarize baseline errors:
+
+```bash
+python3 scripts/report_baseline_errors.py
+```
+
+Current deterministic baseline metrics:
+
+```text
+expected_item_count: 149
+predicted_item_count: 117
+matched_item_count: 110
+missing_item_count: 39
+extra_item_count: 7
+invalid_trap_hit_count: 0
+source_quote_failure_count: 0
+```
 
 ## Key Documentation
 
 - `docs/domain_contracts.md`: stable domain contracts and invariants.
 - `docs/clinical_rules.md`: deterministic clinical rule behavior.
-- `docs/evaluation.md`: current evaluation harness behavior.
-- `docs/prediction_format.md`: saved prediction JSON contract for future CLI use.
+- `docs/evaluation.md`: evaluation domain and CLI behavior.
+- `docs/prediction_format.md`: saved prediction JSON contract.
+- `docs/ai_extraction_harness.md`: next milestone technical spec for AI/LLM extraction.
 - `docs/architecture.md`: broader target architecture.
 
 ## How to Run Tests
 
+Focused domain and script suite:
+
 ```bash
-python3 -m unittest processor.tests.test_evaluation processor.tests.test_clinical_rules processor.tests.test_normalization processor.tests.test_extraction_schema processor.tests.test_validation processor.tests.test_source_spans processor.tests.test_sectioning -v
+python3 -m unittest processor.tests.test_report_baseline_errors_script processor.tests.test_run_baseline_extractor_script processor.tests.test_eval_golden_script processor.tests.test_evaluation processor.tests.test_baseline_extractor processor.tests.test_clinical_rules processor.tests.test_normalization processor.tests.test_extraction_schema processor.tests.test_validation processor.tests.test_source_spans processor.tests.test_sectioning -v
 ```
 
-## Recommended Next Steps
+## Recommended Next Step
 
-1. Implement prediction JSON parsing for `docs/prediction_format.md`.
-2. Add a lightweight `scripts/eval_golden.py` CLI after the prediction parser is stable.
-3. Build manual baseline prediction files for a small subset of golden notes.
-4. Expand golden notes with harder clinical ambiguity and noisier source text.
-5. Only then integrate extractor or LLM-generated predictions.
+Stop expanding the deterministic baseline unless a specific regression demands
+it. The next milestone is the AI/LLM extraction harness described in
+`docs/ai_extraction_harness.md`.
+
+The first AI harness implementation should use a fixture provider, strict JSON
+parsing, exact local source grounding, clinical rule integration, and
+`predictions_llm/*.predicted.json` outputs compatible with `scripts/eval_golden.py`.
