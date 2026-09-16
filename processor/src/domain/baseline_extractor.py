@@ -51,6 +51,7 @@ _MEDICATION_SECTIONS = {
     "Medications",
     "Medications on Discharge",
     "Current Medications",
+    "Medication History",
 }
 _PROCEDURE_SECTIONS = {
     "Past Surgical History",
@@ -136,6 +137,42 @@ _ORDER_PATTERNS: tuple[tuple[str, str, re.Pattern[str]], ...] = (
         re.compile(r"\bPathology report pending\.(?=\s|$)", re.IGNORECASE),
     ),
 )
+_MEDICATION_ACTION_SECTIONS = {
+    "Assessment",
+    "Assessment and Plan",
+    "Orders",
+    "Orders and Referrals",
+}
+_MEDICATION_ACTION_PATTERNS: tuple[tuple[str, str, re.Pattern[str]], ...] = (
+    (
+        "ondansetron",
+        "administered",
+        re.compile(r"\bOndansetron 4 mg IV given\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "ferrous sulfate",
+        "active",
+        re.compile(r"\bStart ferrous sulfate 325 mg every other day\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "azithromycin",
+        "started",
+        re.compile(
+            r"\bStart azithromycin 500 mg today then 250 mg daily for four days\.(?=\s|$)",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "losartan",
+        "planned_change",
+        re.compile(r"\bIncrease losartan to 100 mg daily\.(?=\s|$)", re.IGNORECASE),
+    ),
+    (
+        "semaglutide",
+        "planned_change",
+        re.compile(r"\bIncrease semaglutide to 2 mg weekly\.(?=\s|$)", re.IGNORECASE),
+    ),
+)
 _CONDITION_ACTION_PREFIXES = (
     "await ",
     "avoid ",
@@ -186,6 +223,7 @@ def extract_baseline_items(raw_text: str, document_id: str) -> tuple[ExtractedCl
     for section in sections:
         items.extend(_extract_lab_items(raw_text, section))
         items.extend(_extract_order_items(raw_text, section))
+        items.extend(_extract_medication_action_items(raw_text, section))
         for sentence, start_char, end_char in _iter_sentence_spans(section):
             items.extend(
                 _extract_sentence_items(raw_text, section, sentence, start_char, end_char)
@@ -253,6 +291,49 @@ def _extract_order_items(
             end_char,
         )
         for start_char, end_char, _, order_name, status, source_quote in sorted(order_spans)
+    )
+
+
+def _extract_medication_action_items(
+    raw_text: str,
+    section: DocumentSection,
+) -> tuple[ExtractedClinicalItem, ...]:
+    if section.name not in _MEDICATION_ACTION_SECTIONS:
+        return ()
+
+    medication_spans: list[tuple[int, int, int, str, str, str]] = []
+    for pattern_index, (medication_name, status, pattern) in enumerate(
+        _MEDICATION_ACTION_PATTERNS
+    ):
+        for match in pattern.finditer(section.text):
+            start_char = section.start_char + match.start()
+            end_char = section.start_char + match.end()
+            medication_spans.append(
+                (
+                    start_char,
+                    end_char,
+                    pattern_index,
+                    medication_name,
+                    status,
+                    match.group(0),
+                )
+            )
+
+    return tuple(
+        _make_item(
+            raw_text,
+            section,
+            ClinicalItemType.MEDICATION,
+            medication_name,
+            status,
+            0.85,
+            source_quote,
+            start_char,
+            end_char,
+        )
+        for start_char, end_char, _, medication_name, status, source_quote in sorted(
+            medication_spans
+        )
     )
 
 

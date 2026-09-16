@@ -79,6 +79,17 @@
       "source_end_char": 587,
       "section_id": "note_008:section:006",
       "section_name": "Orders"
+    },
+    {
+      "type": "medication",
+      "name": "azithromycin",
+      "status": "started",
+      "confidence": 0.85,
+      "source_quote": "Start azithromycin 500 mg today then 250 mg daily for four days.",
+      "source_start_char": 588,
+      "source_end_char": 652,
+      "section_id": "note_008:section:006",
+      "section_name": "Orders"
     }
   ]
 }

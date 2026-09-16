@@ -79,6 +79,17 @@
       "source_end_char": 521,
       "section_id": "note_005:section:004",
       "section_name": "Orders and Referrals"
+    },
+    {
+      "type": "medication",
+      "name": "ferrous sulfate",
+      "status": "active",
+      "confidence": 0.85,
+      "source_quote": "Start ferrous sulfate 325 mg every other day.",
+      "source_start_char": 522,
+      "source_end_char": 567,
+      "section_id": "note_005:section:004",
+      "section_name": "Orders and Referrals"
     }
   ]
 }

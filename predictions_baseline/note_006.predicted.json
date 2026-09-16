@@ -153,6 +153,17 @@
       "section_name": "Assessment and Plan"
     },
     {
+      "type": "medication",
+      "name": "losartan",
+      "status": "planned_change",
+      "confidence": 0.85,
+      "source_quote": "Increase losartan to 100 mg daily.",
+      "source_start_char": 669,
+      "source_end_char": 703,
+      "section_id": "note_006:section:008",
+      "section_name": "Assessment and Plan"
+    },
+    {
       "type": "condition",
       "name": "hypertension",
       "status": "active",

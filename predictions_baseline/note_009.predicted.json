@@ -155,6 +155,17 @@
       "section_name": "Assessment and Plan"
     },
     {
+      "type": "medication",
+      "name": "semaglutide",
+      "status": "planned_change",
+      "confidence": 0.85,
+      "source_quote": "Increase semaglutide to 2 mg weekly.",
+      "source_start_char": 738,
+      "source_end_char": 774,
+      "section_id": "note_009:section:009",
+      "section_name": "Assessment and Plan"
+    },
+    {
       "type": "condition",
       "name": "diabetes above goal",
       "status": "active",

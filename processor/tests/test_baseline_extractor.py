@@ -67,6 +67,83 @@ class BaselineExtractorTests(unittest.TestCase):
             [(item.name, item.status) for item in items],
         )
 
+    def test_extracts_stopped_medication_from_medication_history(self) -> None:
+        raw_text = (
+            "Medication History:\n"
+            "Apixaban 5 mg twice daily was stopped last week after melena.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "stopped_history")
+
+        self.assert_medication(items[0], "apixaban", "stopped")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_active_medication_from_active_statement(self) -> None:
+        raw_text = "Medication History:\nAspirin 81 mg daily is active.\n"
+
+        items = extract_baseline_items(raw_text, "active_statement")
+
+        self.assert_medication(items[0], "aspirin", "active")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_held_medication_from_reason_quote(self) -> None:
+        raw_text = "Medication History:\nHydrochlorothiazide held because sodium was low.\n"
+
+        items = extract_baseline_items(raw_text, "held_reason")
+
+        self.assert_medication(items[0], "hydrochlorothiazide", "held")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_administered_medication_from_given_quote(self) -> None:
+        raw_text = "Orders:\nOndansetron 4 mg IV given.\n"
+
+        items = extract_baseline_items(raw_text, "administered_med")
+
+        self.assert_medication(items[0], "ondansetron", "administered")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_started_medication_from_start_quote(self) -> None:
+        raw_text = "Orders and Referrals:\nStart ferrous sulfate 325 mg every other day.\n"
+
+        items = extract_baseline_items(raw_text, "started_med")
+
+        self.assert_medication(items[0], "ferrous sulfate", "active")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_started_antibiotic_from_start_quote(self) -> None:
+        raw_text = (
+            "Orders:\n"
+            "Start azithromycin 500 mg today then 250 mg daily for four days.\n"
+        )
+
+        items = extract_baseline_items(raw_text, "started_antibiotic")
+
+        self.assert_medication(items[0], "azithromycin", "started")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_planned_change_medication_from_increase_quote(self) -> None:
+        raw_text = "Assessment and Plan:\nIncrease losartan to 100 mg daily.\n"
+
+        items = extract_baseline_items(raw_text, "planned_change_med")
+
+        self.assert_medication(items[0], "losartan", "planned_change")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_extracts_planned_change_injectable_from_increase_quote(self) -> None:
+        raw_text = "Assessment and Plan:\nIncrease semaglutide to 2 mg weekly.\n"
+
+        items = extract_baseline_items(raw_text, "planned_change_injectable")
+
+        self.assert_medication(items[0], "semaglutide", "planned_change")
+        self.assert_all_source_spans_are_exact(raw_text, items)
+
+    def test_does_not_extract_avoid_nsaids_as_active_medication(self) -> None:
+        raw_text = "Assessment:\nAvoid NSAIDs.\n"
+
+        items = extract_baseline_items(raw_text, "avoid_nsaids")
+
+        self.assertFalse(any(item.item_type == ClinicalItemType.MEDICATION for item in items))
+
     def test_extracts_multiple_lab_results_from_labs_section(self) -> None:
         raw_text = (
             "Labs:\n"
@@ -489,6 +566,11 @@ class BaselineExtractorTests(unittest.TestCase):
 
     def assert_order(self, item, name: str, status: str) -> None:
         self.assertEqual(ClinicalItemType.ORDER, item.item_type)
+        self.assertEqual(name, item.name)
+        self.assertEqual(status, item.status)
+
+    def assert_medication(self, item, name: str, status: str) -> None:
+        self.assertEqual(ClinicalItemType.MEDICATION, item.item_type)
         self.assertEqual(name, item.name)
         self.assertEqual(status, item.status)
 

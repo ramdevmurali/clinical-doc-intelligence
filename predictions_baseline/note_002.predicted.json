@@ -101,6 +101,17 @@
       "section_name": "Orders"
     },
     {
+      "type": "medication",
+      "name": "ondansetron",
+      "status": "administered",
+      "confidence": 0.85,
+      "source_quote": "Ondansetron 4 mg IV given.",
+      "source_start_char": 690,
+      "source_end_char": 716,
+      "section_id": "note_002:section:008",
+      "section_name": "Orders"
+    },
+    {
       "type": "condition",
       "name": "abdominal pain with leukocytosis",
       "status": "active",
