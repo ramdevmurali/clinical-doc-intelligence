@@ -6,15 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from processor.src.domain.ai_extraction_grounding import ground_ai_candidates
-from processor.src.domain.ai_extraction_prompt import PromptMessage
-from processor.src.domain.ai_extraction_response import (
-    AI_EXTRACTION_RESPONSE_SCHEMA_VERSION,
-    AiCandidateItem,
-)
 from processor.src.domain.evaluation import predicted_items_from_json
-from processor.src.domain.extraction_schema import ClinicalItemType
-from processor.src.domain.sectioning import parse_sections
 from processor.src.services.llm_provider import LlmResponse
 from scripts import run_ai_extractor
 
@@ -175,70 +167,50 @@ class RunAiExtractorScriptTests(unittest.TestCase):
             with self.assertRaisesRegex(run_ai_extractor.AiExtractorRunnerError, "expected KEY=VALUE"):
                 run_ai_extractor.load_env_file(env_file)
 
-    def test_audit_json_preserves_rejected_candidates_and_findings(self) -> None:
-        raw_text = "Assessment:\nHypertension.\nStable. Stable.\n\nMedications:\nMetformin was discontinued.\n"
-        sections = tuple(parse_sections(raw_text, document_id="note_test"))
-        candidates = (
-            AiCandidateItem(
-                item_type=ClinicalItemType.CONDITION,
-                name="stable",
-                status="present",
-                confidence=0.95,
-                source_quote="Stable.",
-                section_id="note_test:section:001",
-                section_name="Assessment",
-            ),
-            AiCandidateItem(
-                item_type=ClinicalItemType.MEDICATION,
-                name="metformin",
-                status="active",
-                confidence=0.95,
-                source_quote="Metformin was discontinued.",
-                section_id="note_test:section:002",
-                section_name="Medications",
-            ),
-        )
-        grounding_result = ground_ai_candidates(
-            raw_text=raw_text,
-            sections=sections,
-            candidates=candidates,
-        )
-        response_content = json.dumps(
-            {
-                "schema_version": AI_EXTRACTION_RESPONSE_SCHEMA_VERSION,
-                "document_id": "note_test",
-                "items": [],
-            }
-        )
+    def test_schema_parse_failure_writes_audit_without_prediction(self) -> None:
+        class BadJsonProvider:
+            name = "bad-json"
 
-        audit = run_ai_extractor.audit_json_for_run(
-            document_id="note_test",
-            provider_name="fixture",
-            model="fixture-model",
-            messages=(PromptMessage(role="user", content="Document ID: note_test"),),
-            response=LlmResponse(
-                provider="fixture",
-                model="fixture-model",
-                content=response_content,
-                latency_ms=12,
-                input_tokens=10,
-                output_tokens=5,
-                request_id="fixture:note_test",
-            ),
-            candidates=candidates,
-            grounding_result=grounding_result,
-        )
+            def complete_json(self, *, model, messages, timeout_seconds):
+                return LlmResponse(
+                    provider=self.name,
+                    model=model,
+                    content="{not json",
+                    latency_ms=3,
+                    input_tokens=2,
+                    output_tokens=1,
+                    request_id="bad-json:note_test",
+                )
 
-        self.assertEqual(2, audit["counts"]["candidate_count"])
-        self.assertEqual(1, audit["counts"]["rejected_by_grounding_count"])
-        self.assertEqual(1, audit["counts"]["rejected_by_rules_count"])
-        self.assertEqual("Stable.", audit["failures"][0]["candidate"]["source_quote"])
-        self.assertEqual("Metformin was discontinued.", audit["failures"][1]["candidate"]["source_quote"])
-        self.assertEqual("RULE_INACTIVE_MEDICATION_NOT_ACTIVE", audit["validation_findings"][0]["rule_id"])
-        self.assertEqual("error", audit["validation_findings"][0]["severity"])
-        self.assertEqual("fixture:note_test", audit["request_id"])
-        self.assertEqual(10, audit["input_tokens"])
-        self.assertEqual(5, audit["output_tokens"])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes_dir = root / "notes"
+            output_dir = root / "predictions_llm"
+            notes_dir.mkdir()
+            (notes_dir / "note_test.txt").write_text("Past Medical History:\nHypertension.\n", encoding="utf-8")
+
+            with patch.object(run_ai_extractor, "provider_for_name", return_value=BadJsonProvider()):
+                stdout, stderr, exit_code = self.run_main(
+                    [
+                        "--document-id",
+                        "note_test",
+                        "--notes-dir",
+                        str(notes_dir),
+                        "--output-dir",
+                        str(output_dir),
+                        "--provider",
+                        "bad-json",
+                    ]
+                )
+
+            self.assertEqual(1, exit_code)
+            self.assertEqual("", stdout)
+            self.assertIn("AI response schema parsing failed", stderr)
+            self.assertFalse((output_dir / "note_test.predicted.json").exists())
+            audit = json.loads((output_dir / "note_test.audit.json").read_text(encoding="utf-8"))
+            self.assertEqual(1, audit["counts"]["rejected_by_schema_count"])
+            self.assertEqual("schema_parse", audit["failures"][0]["stage"])
+            self.assertEqual("bad-json:note_test", audit["request_id"])
 
     def test_processes_real_note_001_with_fixture_provider(self) -> None:
         root = Path(__file__).resolve().parents[2]

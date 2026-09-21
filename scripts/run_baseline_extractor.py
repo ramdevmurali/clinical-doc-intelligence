@@ -19,10 +19,9 @@ from processor.src.domain.baseline_extractor import (  # noqa: E402
     BaselineExtractionError,
     extract_baseline_items,
 )
-from processor.src.domain.extraction_schema import ExtractedClinicalItem  # noqa: E402
+from processor.src.domain.prediction_format import prediction_json_for_items  # noqa: E402
 
 
-SCHEMA_VERSION = "prediction-format-v1"
 EXTRACTOR_NAME = "deterministic-baseline"
 
 
@@ -112,7 +111,14 @@ def run_baseline_extractor(
         except BaselineExtractionError as exc:
             raise BaselineRunnerError(f"{note_document_id}: baseline extraction failed: {exc}") from exc
 
-        prediction_json = prediction_json_for_items(note_document_id, items)
+        prediction_json = prediction_json_for_items(
+            note_document_id,
+            items,
+            extractor={
+                "name": EXTRACTOR_NAME,
+                "version": BASELINE_EXTRACTOR_VERSION,
+            },
+        )
         try:
             output_dir.mkdir(parents=True, exist_ok=True)
             output_path.write_text(json.dumps(prediction_json, indent=2) + "\n", encoding="utf-8")
@@ -155,39 +161,6 @@ def read_text_file(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except OSError as exc:
         raise BaselineRunnerError(f"could not read note file {path}: {exc}") from exc
-
-
-def prediction_json_for_items(document_id: str, items: tuple[ExtractedClinicalItem, ...]) -> dict:
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "document_id": document_id,
-        "extractor": {
-            "name": EXTRACTOR_NAME,
-            "version": BASELINE_EXTRACTOR_VERSION,
-        },
-        "items": [prediction_item_from_extracted_item(item) for item in items],
-    }
-
-
-def prediction_item_from_extracted_item(item: ExtractedClinicalItem) -> dict:
-    prediction_item = {
-        "type": item.item_type.value,
-        "name": item.name,
-    }
-    if item.status is not None:
-        prediction_item["status"] = item.status
-    if item.confidence is not None:
-        prediction_item["confidence"] = item.confidence
-    prediction_item.update(
-        {
-            "source_quote": item.source_quote,
-            "source_start_char": item.source_start_char,
-            "source_end_char": item.source_end_char,
-            "section_id": item.section_id,
-            "section_name": item.section_name,
-        }
-    )
-    return prediction_item
 
 
 class BaselineRunnerError(ValueError):

@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import sys
@@ -16,33 +15,27 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from processor.src.domain.ai_extraction_grounding import (  # noqa: E402
-    AiGroundingFailure,
-    AiGroundingResult,
-    GroundedAiItem,
-    ground_ai_candidates,
+from processor.src.domain.ai_extraction_audit import (  # noqa: E402
+    audit_json_for_run,
+    audit_json_for_schema_failure,
+    extractor_metadata,
 )
+from processor.src.domain.ai_extraction_grounding import ground_ai_candidates  # noqa: E402
 from processor.src.domain.ai_extraction_prompt import (  # noqa: E402
     AI_EXTRACTION_PROMPT_VERSION,
-    PromptMessage,
     build_ai_extraction_messages,
 )
 from processor.src.domain.ai_extraction_response import (  # noqa: E402
-    AiCandidateItem,
+    AiExtractionResponseError,
     parse_ai_extraction_response,
 )
 from processor.src.domain.evaluation import predicted_items_from_json  # noqa: E402
-from processor.src.domain.extraction_schema import ExtractedClinicalItem  # noqa: E402
+from processor.src.domain.prediction_format import prediction_json_for_items  # noqa: E402
 from processor.src.domain.sectioning import parse_sections  # noqa: E402
-from processor.src.services.llm_provider import LlmProviderError, LlmResponse, provider_for_name  # noqa: E402
-from scripts.run_baseline_extractor import (  # noqa: E402
-    prediction_item_from_extracted_item,
-    read_text_file,
-    resolve_note_paths,
-)
+from processor.src.services.llm_provider import LlmProviderError, provider_for_name  # noqa: E402
+from scripts.run_baseline_extractor import read_text_file, resolve_note_paths  # noqa: E402
 
 
-SCHEMA_VERSION = "prediction-format-v1"
 AI_EXTRACTOR_VERSION = "ai-extractor-v1"
 EXTRACTOR_NAME = "llm-harness"
 DEFAULT_MODEL = "fixture-model"
@@ -217,27 +210,56 @@ def run_ai_extractor(
                 messages=messages,
                 timeout_seconds=timeout_seconds,
             )
+            extractor = extractor_metadata(
+                provider_name=response.provider,
+                model=response.model,
+                extractor_name=EXTRACTOR_NAME,
+                extractor_version=AI_EXTRACTOR_VERSION,
+                prompt_version=AI_EXTRACTION_PROMPT_VERSION,
+            )
             candidates = parse_ai_extraction_response(response.content, document_id=note_document_id)
             grounding_result = ground_ai_candidates(
                 raw_text=raw_text,
                 sections=sections,
                 candidates=candidates,
             )
+        except AiExtractionResponseError as exc:
+            audit_json = audit_json_for_schema_failure(
+                document_id=note_document_id,
+                extractor=extractor,
+                messages=messages,
+                raw_response_content=response.content,
+                latency_ms=response.latency_ms,
+                input_tokens=response.input_tokens,
+                output_tokens=response.output_tokens,
+                request_id=response.request_id,
+                reason=str(exc),
+            )
+            try:
+                output_dir.mkdir(parents=True, exist_ok=True)
+                audit_path.write_text(json.dumps(audit_json, indent=2) + "\n", encoding="utf-8")
+            except OSError as write_exc:
+                raise AiExtractorRunnerError(
+                    f"could not write schema failure audit file for {note_document_id}: {write_exc}"
+                ) from write_exc
+            raise AiExtractorRunnerError(f"{note_document_id}: AI response schema parsing failed: {exc}") from exc
         except Exception as exc:
             raise AiExtractorRunnerError(f"{note_document_id}: AI extraction failed: {exc}") from exc
 
         prediction_json = prediction_json_for_items(
             note_document_id,
             grounding_result.prediction_items,
-            provider_name=response.provider,
-            model=response.model,
+            extractor=extractor,
         )
         audit_json = audit_json_for_run(
             document_id=note_document_id,
-            provider_name=response.provider,
-            model=response.model,
+            extractor=extractor,
             messages=messages,
-            response=response,
+            raw_response_content=response.content,
+            latency_ms=response.latency_ms,
+            input_tokens=response.input_tokens,
+            output_tokens=response.output_tokens,
+            request_id=response.request_id,
             candidates=candidates,
             grounding_result=grounding_result,
         )
@@ -259,157 +281,6 @@ def run_ai_extractor(
         )
 
     return tuple(summaries)
-
-
-def prediction_json_for_items(
-    document_id: str,
-    items: tuple[ExtractedClinicalItem, ...],
-    *,
-    provider_name: str,
-    model: str,
-) -> dict:
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "document_id": document_id,
-        "extractor": {
-            "name": EXTRACTOR_NAME,
-            "version": AI_EXTRACTOR_VERSION,
-            "provider": provider_name,
-            "model": model,
-            "prompt_version": AI_EXTRACTION_PROMPT_VERSION,
-        },
-        "items": [prediction_item_from_extracted_item(item) for item in items],
-    }
-
-
-def audit_json_for_run(
-    *,
-    document_id: str,
-    provider_name: str,
-    model: str,
-    messages: tuple[PromptMessage, ...],
-    response: LlmResponse,
-    candidates: tuple[AiCandidateItem, ...],
-    grounding_result: AiGroundingResult,
-) -> dict:
-    return {
-        "document_id": document_id,
-        "extractor": extractor_metadata(provider_name=provider_name, model=model),
-        "counts": {
-            "candidate_count": len(candidates),
-            "accepted_count": len(grounding_result.accepted),
-            "needs_review_count": len(grounding_result.needs_review),
-            "rejected_by_schema_count": 0,
-            "rejected_by_grounding_count": len(grounding_result.rejected_by_grounding),
-            "rejected_by_rules_count": len(grounding_result.rejected_by_rules),
-        },
-        "failures": [
-            failure_json_for_grounding_failure(failure)
-            for failure in grounding_result.rejected_by_grounding + grounding_result.rejected_by_rules
-        ],
-        "validation_findings": validation_findings_for_grounded_items(
-            grounding_result.needs_review,
-            grounding_result.rejected_by_rules,
-        ),
-        "prompt_sha256": sha256_text(prompt_hash_input(messages)),
-        "raw_response_sha256": sha256_text(response.content),
-        "latency_ms": response.latency_ms,
-        "input_tokens": response.input_tokens,
-        "output_tokens": response.output_tokens,
-        "request_id": response.request_id,
-    }
-
-
-def extractor_metadata(*, provider_name: str, model: str) -> dict:
-    return {
-        "name": EXTRACTOR_NAME,
-        "version": AI_EXTRACTOR_VERSION,
-        "provider": provider_name,
-        "model": model,
-        "prompt_version": AI_EXTRACTION_PROMPT_VERSION,
-    }
-
-
-def failure_json_for_grounding_failure(failure: AiGroundingFailure) -> dict:
-    return {
-        "candidate_index": failure.candidate_index,
-        "stage": failure.stage,
-        "reason": failure.reason,
-        "candidate": candidate_json(failure.candidate),
-    }
-
-
-def validation_findings_for_grounded_items(
-    needs_review: tuple[GroundedAiItem, ...],
-    rejected_by_rules: tuple[AiGroundingFailure, ...],
-) -> list[dict]:
-    findings = []
-    for grounded in needs_review:
-        for finding in grounded.validation.findings:
-            findings.append(
-                {
-                    "candidate_index": grounded.candidate_index,
-                    "stage": "clinical_rules",
-                    "decision": grounded.validation.status.value,
-                    "rule_id": finding.rule_id,
-                    "severity": finding.severity.value,
-                    "message": finding.message,
-                    "item": prediction_item_from_extracted_item(grounded.item),
-                }
-            )
-    for failure in rejected_by_rules:
-        if not failure.findings:
-            findings.append(
-                {
-                    "candidate_index": failure.candidate_index,
-                    "stage": "clinical_rules",
-                    "decision": "rejected",
-                    "message": failure.reason,
-                    "candidate": candidate_json(failure.candidate),
-                }
-            )
-            continue
-
-        for finding in failure.findings:
-            findings.append(
-                {
-                    "candidate_index": failure.candidate_index,
-                    "stage": "clinical_rules",
-                    "decision": "rejected",
-                    "rule_id": finding.rule_id,
-                    "severity": finding.severity.value,
-                    "message": finding.message,
-                    "candidate": candidate_json(failure.candidate),
-                }
-            )
-    return findings
-
-
-def candidate_json(candidate: AiCandidateItem) -> dict:
-    item = {
-        "type": candidate.item_type.value,
-        "name": candidate.name,
-        "source_quote": candidate.source_quote,
-        "section_id": candidate.section_id,
-        "section_name": candidate.section_name,
-    }
-    if candidate.status is not None:
-        item["status"] = candidate.status
-    if candidate.confidence is not None:
-        item["confidence"] = candidate.confidence
-    return item
-
-
-def prompt_hash_input(messages: tuple[PromptMessage, ...]) -> str:
-    return json.dumps(
-        [{"role": message.role, "content": message.content} for message in messages],
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-
-
-def sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 class AiExtractorRunnerError(ValueError):
