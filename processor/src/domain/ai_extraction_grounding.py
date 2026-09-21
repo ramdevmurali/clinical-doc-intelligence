@@ -9,7 +9,7 @@ from processor.src.domain.clinical_rules import validate_clinical_item
 from processor.src.domain.extraction_schema import ExtractedClinicalItem, ExtractionSchemaError
 from processor.src.domain.sectioning import DocumentSection
 from processor.src.domain.source_spans import SourceSpanError, validate_source_span
-from processor.src.domain.validation import ValidationDecision, ValidationStatus
+from processor.src.domain.validation import ValidationDecision, ValidationFinding, ValidationStatus
 
 
 @dataclass(frozen=True)
@@ -28,6 +28,8 @@ class AiGroundingFailure:
     candidate_index: int
     stage: str
     reason: str
+    candidate: AiCandidateItem
+    findings: tuple[ValidationFinding, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -75,7 +77,12 @@ def ground_ai_candidates(
             item = _ground_candidate(raw_text, section_lookup, candidate)
         except (AiExtractionGroundingError, ExtractionSchemaError, SourceSpanError) as exc:
             rejected_by_grounding.append(
-                AiGroundingFailure(candidate_index=index, stage="grounding", reason=str(exc))
+                AiGroundingFailure(
+                    candidate_index=index,
+                    stage="grounding",
+                    reason=str(exc),
+                    candidate=candidate,
+                )
             )
             continue
 
@@ -102,6 +109,8 @@ def ground_ai_candidates(
                     candidate_index=index,
                     stage="clinical_rules",
                     reason="; ".join(finding.message for finding in decision.findings),
+                    candidate=candidate,
+                    findings=decision.findings,
                 )
             )
         else:

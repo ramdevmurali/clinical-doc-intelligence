@@ -39,6 +39,7 @@ class AiExtractionGroundingTests(unittest.TestCase):
         self.assertEqual((), result.prediction_items)
         self.assertEqual(1, len(result.rejected_by_grounding))
         self.assertIn("not found", result.rejected_by_grounding[0].reason)
+        self.assertEqual(candidate, result.rejected_by_grounding[0].candidate)
 
     def test_rejects_ambiguous_quote_inside_declared_section(self) -> None:
         raw_text = "Assessment:\nStable. Stable.\n"
@@ -97,6 +98,8 @@ class AiExtractionGroundingTests(unittest.TestCase):
         self.assertEqual((), result.prediction_items)
         self.assertEqual(1, len(result.rejected_by_rules))
         self.assertIn("Discontinued", result.rejected_by_rules[0].reason)
+        self.assertEqual(candidate, result.rejected_by_rules[0].candidate)
+        self.assertEqual("RULE_INACTIVE_MEDICATION_NOT_ACTIVE", result.rejected_by_rules[0].findings[0].rule_id)
 
     def test_requires_raw_text_and_sections(self) -> None:
         with self.assertRaises(AiExtractionGroundingError):
