@@ -1,14 +1,15 @@
 # AI Extraction Harness Technical Spec
 
-Status: proposed next milestone
+Status: implemented through local harness Phase 2; Phase 3 evaluation is next
 
 Owner: Clinical Document Intelligence
 
 Scope: local AI/LLM extraction harness for synthetic clinical notes
 
-This document specifies the next production-grade milestone after the
-deterministic baseline extractor. It is implementation context for future work.
-It does not define backend, Kafka, UI, FHIR export, or real patient data flows.
+This document specifies and tracks the production-grade local AI extraction
+harness after the deterministic baseline extractor. It is implementation
+context for current and future work. It does not define backend, Kafka, UI,
+FHIR export, or real patient data flows.
 
 The current repository is the implementation truth. Attached project specs are
 background only.
@@ -31,10 +32,22 @@ candidate clinical facts, but the local code must own:
 - audit metadata
 - golden-set evaluation compatibility
 
-The first implementation should prove the harness can call a model through a
-small provider abstraction, convert the model response into source-grounded
+The current implementation proves the harness can call a model through a small
+provider abstraction, convert the model response into source-grounded
 `ExtractedClinicalItem` objects, write `predictions_llm/*.predicted.json`, and
 evaluate those files using the existing `scripts/eval_golden.py` path.
+
+Current implemented status:
+
+- Phase 1 fixture-backed harness is complete.
+- Phase 2 Gemini provider adapter is complete for local synthetic-note runs.
+- Audit sidecars are always written for successful runs.
+- Schema parse failures write audit sidecars and do not write prediction files.
+- Prediction serialization is shared between baseline and AI runners.
+- Final prediction items are sorted deterministically before writing.
+- Baseline-vs-AI comparison tooling exists.
+- Full golden-set Gemini evaluation is not complete yet.
+- Backend, worker, review UI, and FHIR flows remain out of scope.
 
 ## Current Repository Anchors
 
@@ -62,10 +75,21 @@ The harness must build on these existing files and contracts:
   - `evaluate_predictions`
 - `scripts/run_baseline_extractor.py`
   - CLI and prediction writer pattern
+  - shared prediction formatting is now in `processor/src/domain/prediction_format.py`
+- `processor/src/domain/prediction_format.py`
+  - `PREDICTION_SCHEMA_VERSION`
   - `prediction_json_for_items`
   - `prediction_item_from_extracted_item`
+- `processor/src/domain/ai_extraction_audit.py`
+  - successful-run audit sidecars
+  - schema-failure audit sidecars
+  - prompt and raw response hashes
 - `scripts/eval_golden.py`
   - saved prediction evaluation
+- `scripts/compare_prediction_runs.py`
+  - baseline-vs-AI comparison
+- `scripts/eval_extractions.py`
+  - placeholder evaluation entrypoint; not the active local evaluation path yet
 - `scripts/report_baseline_errors.py`
   - aggregate error reporting pattern
 - `docs/prediction_format.md`
@@ -186,30 +210,35 @@ The LLM is not trusted to produce final prediction files. It only produces
 candidate item JSON. Local deterministic code converts candidates into final
 prediction JSON.
 
-## Proposed Files
+## Implemented Files
 
-First implementation target:
+Current implementation:
 
 ```text
 processor/src/domain/ai_extraction_prompt.py
 processor/src/domain/ai_extraction_response.py
 processor/src/domain/ai_extraction_grounding.py
+processor/src/domain/ai_extraction_audit.py
+processor/src/domain/prediction_format.py
 processor/src/services/llm_provider.py
 scripts/run_ai_extractor.py
+scripts/compare_prediction_runs.py
 processor/tests/test_ai_extraction_prompt.py
 processor/tests/test_ai_extraction_response.py
 processor/tests/test_ai_extraction_grounding.py
+processor/tests/test_ai_extraction_audit.py
+processor/tests/test_prediction_format.py
+processor/tests/test_llm_provider.py
 processor/tests/test_run_ai_extractor_script.py
+processor/tests/test_compare_prediction_runs_script.py
 predictions_llm/
 ```
 
-Optional follow-up files:
+Potential follow-up files:
 
 ```text
-scripts/compare_prediction_runs.py
 scripts/report_ai_errors.py
 processor/src/domain/extractor_comparison.py
-processor/tests/test_compare_prediction_runs_script.py
 docs/extractor_comparison.md
 ```
 
@@ -244,6 +273,7 @@ docs/extractor_comparison.md
 - Defines a small provider protocol.
 - Owns provider-specific network calls and credentials.
 - Provides a fake/fixture provider for tests.
+- Provides the Gemini generateContent adapter for local synthetic-note runs.
 - Must not contain clinical parsing logic.
 
 `scripts/run_ai_extractor.py`
@@ -252,8 +282,24 @@ docs/extractor_comparison.md
 - Reads note files.
 - Calls the provider through the abstraction.
 - Writes prediction JSON files.
-- Writes optional audit sidecars.
+- Writes audit sidecars.
 - Does not read `golden_set/expected/`.
+
+`processor/src/domain/prediction_format.py`
+
+- Owns `prediction-format-v1` serialization.
+- Converts `ExtractedClinicalItem` values to prediction JSON items.
+- Sorts final prediction items by
+  `(source_start_char, source_end_char, type, name, status)`.
+- Is shared by baseline and AI runners.
+
+`processor/src/domain/ai_extraction_audit.py`
+
+- Owns audit sidecar shape.
+- Records provider/model/prompt metadata.
+- Hashes prompt messages and raw provider responses.
+- Records grounding and clinical-rule failures.
+- Records schema parse failures without producing prediction files.
 
 ## Input Contracts
 
@@ -280,15 +326,17 @@ Arguments:
   - Defaults to `predictions_llm`.
 - `--provider`
   - Required or defaulted explicitly.
-  - Initial values: `fixture`; later values may include real providers.
+  - Current values: `fixture`, `gemini`.
 - `--model`
   - Provider-specific model identifier.
 - `--overwrite`
   - Required to replace existing prediction files.
 - `--dry-run`
   - Builds prompt and parses sections without calling a real provider.
+  - Not implemented yet.
 - `--save-audit`
   - Writes audit sidecars. This should default to enabled for local work.
+  - Not implemented as a flag; audit sidecars are currently always written.
 
 The extractor must not read expected labels. Tests should explicitly protect
 that boundary, as `test_run_baseline_extractor_script.py` does for the baseline.
@@ -736,7 +784,7 @@ read expected labels.
 
 ## Baseline vs AI Comparison Plan
 
-Add a comparison script after the first harness works:
+Use the existing comparison script after AI predictions are written:
 
 ```text
 scripts/compare_prediction_runs.py
@@ -914,6 +962,24 @@ The runner should avoid noisy logs that make tests brittle.
 - provider failure returns clear error
 - real provider tests are skipped unless configured
 
+`processor/tests/test_ai_extraction_audit.py`
+
+- successful-run audit records rejected candidates and rule findings
+- schema-failure audit records `rejected_by_schema_count`
+- audit hashes prompt and raw response content
+
+`processor/tests/test_prediction_format.py`
+
+- prediction JSON preserves the shared `prediction-format-v1` contract
+- optional status and confidence fields are omitted when absent
+- final prediction items are sorted deterministically
+
+`processor/tests/test_llm_provider.py`
+
+- fixture provider returns deterministic candidate JSON
+- Gemini provider builds requests and parses output text
+- Gemini credential failures are explicit and testable
+
 ### Regression Tests
 
 Use a fixture provider with static responses for:
@@ -944,6 +1010,10 @@ python3 -m unittest \
   processor.tests.test_clinical_rules \
   processor.tests.test_source_spans \
   processor.tests.test_sectioning \
+  processor.tests.test_ai_extraction_audit \
+  processor.tests.test_prediction_format \
+  processor.tests.test_llm_provider \
+  processor.tests.test_compare_prediction_runs_script \
   -v
 ```
 
@@ -957,7 +1027,7 @@ python3 scripts/eval_golden.py --predictions-dir predictions_llm --document-id n
 If a real provider adapter is included:
 
 ```bash
-python3 scripts/run_ai_extractor.py --provider real-provider --document-id note_001 --overwrite
+python3 scripts/run_ai_extractor.py --provider gemini --document-id note_001 --overwrite
 python3 scripts/eval_golden.py --predictions-dir predictions_llm --document-id note_001
 ```
 
@@ -966,12 +1036,12 @@ not configured.
 
 ## Rollout Phases
 
-### Phase 0: Spec
+### Phase 0: Spec - Complete
 
 - Add this document.
 - No code.
 
-### Phase 1: Harness Skeleton with Fixture Provider
+### Phase 1: Harness Skeleton with Fixture Provider - Complete
 
 - Prompt builder.
 - Strict response parser.
@@ -981,6 +1051,10 @@ not configured.
 - CLI runner.
 - Tests.
 - One-note fixture extraction path.
+- Shared prediction serialization.
+- Audit sidecar serialization.
+- Schema-failure audit behavior.
+- Deterministic prediction sorting.
 
 Acceptance:
 
@@ -989,9 +1063,9 @@ Acceptance:
 - Source quote failures are zero for fixture output.
 - The extractor does not read expected labels.
 
-### Phase 2: Real Provider Adapter
+### Phase 2: Real Provider Adapter - Complete
 
-- Add one provider adapter behind `LlmProvider`.
+- Add Gemini provider adapter behind `LlmProvider`.
 - Add credential/config error handling.
 - Add timeout handling.
 - Add raw response hash and provider metadata.
@@ -1003,12 +1077,13 @@ Acceptance:
 - Missing credentials fail clearly.
 - No provider-specific code enters `processor/src/domain/`.
 
-### Phase 3: Golden Set Run and Baseline Comparison
+### Phase 3: Golden Set Run and Baseline Comparison - Next
 
 - Run all 10 golden notes into `predictions_llm/`.
 - Evaluate with `scripts/eval_golden.py`.
-- Add comparison script.
+- Use `scripts/compare_prediction_runs.py`.
 - Report baseline vs AI deltas.
+- Inspect audit sidecars for schema, grounding, and rule failures.
 
 Acceptance:
 
@@ -1023,6 +1098,9 @@ Acceptance:
 - Prepare future review queue data shape.
 - Do not build the UI yet.
 
+Note: basic `needs_review` audit recording exists. The future work is a
+review-oriented data shape that can feed an end-to-end UI or backend.
+
 ### Phase 5: Backend Worker Integration
 
 - Only after the local harness is credible.
@@ -1030,6 +1108,8 @@ Acceptance:
 - Preserve the same domain parser, grounding, validation, and eval contracts.
 
 ## Acceptance Criteria for the First Implementation Commit
+
+Status: satisfied by the current local harness implementation.
 
 The first implementation commit should be named something like:
 
@@ -1126,33 +1206,38 @@ Mitigation:
 - Do not claim calibration.
 - Measure confidence behavior later against golden correctness.
 
+## Resolved Decisions
+
+- The first real provider adapter is Gemini and belongs to Phase 2.
+- Malformed JSON is a hard-fail in the current implementation. The runner writes
+  a schema-failure audit sidecar and does not write a prediction file.
+- Audit sidecars store hashes by default, not raw prompt or raw response text.
+- Baseline-vs-AI comparison metrics live in `scripts/compare_prediction_runs.py`.
+
 ## Open Decisions
 
-- Should the first real provider adapter be included in Phase 1 or Phase 2?
-- Should malformed JSON trigger an optional repair call, or remain hard-fail for
-  the first real-provider pass?
+- Should a later version add an optional repair call after malformed JSON, or
+  keep hard-fail behavior permanently?
 - Should `needs_review` items be included in prediction files or separated once
   a review queue exists?
-- Should audit sidecars store raw prompt/response text or only hashes by
-  default?
 - Should `predictions_llm/` be committed, or should only selected fixture
   outputs be committed?
-- Should comparison metrics live in `scripts/compare_prediction_runs.py` or be
-  added to `report_ai_errors.py`?
 - Should AI candidate parsing preserve type-specific fields such as dose,
   frequency, unit, relation, and date in a later schema version?
+- Should `--dry-run`, `--save-audit`, and `--continue-on-error` be added before
+  end-to-end product work, or deferred until the local UI/backend path exists?
 
-## Recommended Next Prompt for Implementation
+## Recommended Next Prompt
 
-When ready to implement, use:
+For the next local harness pass, use:
 
 ```text
-Implement Phase 1 of docs/ai_extraction_harness.md.
+Run Phase 3 of docs/ai_extraction_harness.md.
 
-Do not add a real provider yet unless necessary. Build the fixture-provider AI
-harness skeleton, strict response parser, source grounding, clinical-rule
-integration, CLI runner, and tests. Keep changes scoped to the files proposed in
-the spec. Do not modify golden_set expected labels. Do not polish the
-deterministic baseline.
+Use the existing Gemini provider and local eval scripts to run a controlled
+3-note, then 10-note, AI extraction evaluation against synthetic golden notes.
+Do not modify golden_set expected labels. Do not tune prompts until the report
+identifies whether failures are schema, grounding, clinical rules, missing
+items, or extra items. Produce a concise baseline-vs-AI comparison summary and
+recommend the next implementation slice.
 ```
-
